@@ -21,7 +21,6 @@ snakemake = globals().get("snakemake", snakemake_mock)
 
 
 def qqrange(arr: np.ndarray) -> np.ndarray:
-    # raise Exception(f"{arr, arr.__class__, arr.shape}")
     window = (31, 31)
     finite = np.isfinite(arr)
     p10 = percentile_filter(

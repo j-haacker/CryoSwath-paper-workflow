@@ -9,6 +9,7 @@ dependencies:
 - cryoswath ==0.2.7
 - dask >=2026.1.2,<2027
 - distributed >=2026.1.2,<2027
+- graphviz >=13,<15
 - jupyter >=1.1.1,<2
 - matplotlib >=3.10.8,<4
 - pandas >=2,<3

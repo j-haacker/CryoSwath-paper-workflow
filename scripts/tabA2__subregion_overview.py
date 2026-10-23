@@ -52,7 +52,6 @@ def main():
         print(r"\middlehline", file=texfile)
         for o1, o2list in o1o2reg_tuple_list:
             o1name = rgi_code_translator(f"{o1:02d}")
-            # print(f"\\multicolumn{{7}}{{l}}{{\\qquad {o1name}}} \\\\", file=texfile)
             for o2 in o2list:
                 region_code = f"{o1:02d}-{o2:02d}"
                 area_rgi = o2_areas_rgi.loc[o1, o2]

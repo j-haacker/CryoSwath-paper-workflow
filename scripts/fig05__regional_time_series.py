@@ -108,10 +108,6 @@ def main():
         region_name = rgi_code_translator(f"{i:02d}") if i != 7 else "Svalbard"
         plt.annotate(
             region_name,
-            # # top right
-            # xy=(1, 1), xycoords="axes fraction",
-            # xytext=(-0.55 * (len(region_name) + 1), -0.5), textcoords="offset fontsize",
-            # lower left
             xy=(0, 0), xycoords="axes fraction",
             xytext=(0.5, 1), textcoords="offset fontsize",
             fontsize='medium', verticalalignment='top', fontfamily='serif',

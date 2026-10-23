@@ -205,7 +205,6 @@ if __name__ == "__main__":
         # datasets, sort the product such that x and y will be monotonic
         # after unstacking, unstack it, and fill all missing
         # cooridinates with nan values.
-        # if True:
         with LocalCluster() as cluster, Client(cluster):
             df = pd.concat(
                 [

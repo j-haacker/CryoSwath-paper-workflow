@@ -63,7 +63,7 @@ def main():
         )
         .resample("QS-AUG", label="left")
         .first()
-    )  # [:-1]
+    )
 
     cs2_ts = (df["elevation"] * o2_areas).sum(axis=1) / (
         (~df["elevation"].iloc[0, :].isnull()) * o2_areas
