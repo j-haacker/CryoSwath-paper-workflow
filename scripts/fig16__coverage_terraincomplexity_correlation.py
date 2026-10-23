@@ -23,13 +23,14 @@ sns.set_theme()
 
 def main():
     df = pd.read_csv(snakemake.input[0], index_col=[0, 1])
+    df["coverage"] *= 100  # Fit and plot coverage in percent.
     fit_res = sm.OLS(df.coverage, sm.tools.add_constant(df.ruggedness / 100)).fit()
     print(fit_res.summary())
     to_yaml(
         {
             (k if k != "ruggedness" else "trend"): {
-                "value": 100 * float(fit_res.params[k]),
-                "uncertainty": 100 * 2 * float(fit_res.bse[k]),  # 2 sigma
+                "value": float(fit_res.params[k]),
+                "uncertainty": 2 * float(fit_res.bse[k]),  # 2 sigma
                 "units": [r"\%"],  # for the trend: per 100 m "ruggedness"
             } for k in fit_res.params.keys()
         },
