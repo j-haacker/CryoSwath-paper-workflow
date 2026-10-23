@@ -283,6 +283,11 @@ rgi_shapefile_tokens = [
 ]
 
 TREND_RASTERS = [local_trend_path(token) for token in filename_tokens]
+TREND_DATASET_LOCAL_DIR = config.get("trend_dataset_local_dir")
+if TREND_DATASET_LOCAL_DIR:
+    TREND_DATASET_LOCAL_DIR = (REPO_ROOT / TREND_DATASET_LOCAL_DIR).resolve()
+    if TREND_DATASET_LOCAL_DIR == Path(pathvar_path("<resources>/trends_dataset")).resolve():
+        raise ValueError("trend_dataset_local_dir must differ from the output directory")
 CURRENT_SOURCE_AREA_TABLE = f"<resources>/{AREA_FILENAME}"
 CURRENT_SOURCE_AVG_TABLE = f"<resources>/{AVERAGE_ELEVATION_FILENAME}"
 TREND_DATASET_OUTPUTS = [
