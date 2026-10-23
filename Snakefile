@@ -452,6 +452,7 @@ if PUBLICATION_ARTIFACT_SOURCE == "produced":
             value_collection="<results>/result__value_collection.yaml",
             trend_tbl="<results>/result__regional_trends.csv",
             grnl_tbl="<results>/result__greenland_trends.csv",
+            period_p_values="<results>/result__period_comparison_p_values.csv",
         log:
             notebook="<logs>/result__value_collection.ipynb",
         benchmark:
@@ -735,6 +736,7 @@ rule materialize_manuscript_tex:
         grnl_tbl="<results>/result__greenland_trends.csv",
         isl_disc="<results>/vatna_deviation_analysis.csv",
         cov_disc="<results>/coverage_analysis.csv",
+        period_p_values="<results>/result__period_comparison_p_values.csv",
     output:
         "paper/manuscript.tex",
     log:

@@ -140,6 +140,11 @@ def publication_members() -> list[dict[str, str]]:
                 "Derived scalar values injected into the manuscript template.",
             ),
             file_spec(
+                "results/result__period_comparison_p_values.csv",
+                "manuscript_input",
+                "Regional and Arctic-wide p-values comparing 2010-2014 with 2020-2024 trends.",
+            ),
+            file_spec(
                 "results/tab01__subregion_trend_table.tex",
                 "manuscript_input",
                 "Rendered LaTeX trend table for the manuscript.",
@@ -350,6 +355,8 @@ this file.
   code/data availability text.
 - Fixed manuscript table and figure issues, including sign conventions
   and the Figure A2 palette/legend handling.
+- Corrected period-comparison p-values and added their regional CSV
+  for automatically reporting significant changes in the manuscript.
 """
 
 

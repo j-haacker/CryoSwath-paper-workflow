@@ -326,6 +326,7 @@ PUBLICATION_ARCHIVED_MANUSCRIPT_INPUTS = [
     "<results>/omitted_subregions.csv",
     "<results>/result__greenland_trends.csv",
     "<results>/result__regional_trends.csv",
+    "<results>/result__period_comparison_p_values.csv",
     "<results>/result__value_collection.yaml",
     "<results>/tab01__subregion_trend_table.tex",
     "<results>/tabA2__subregion_overview.tex",

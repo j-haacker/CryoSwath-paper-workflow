@@ -86,6 +86,21 @@ def prepend_figure_path(filename: str) -> str:
     return os.path.join("figures", filename)
 
 
+def significant_period_changes(p_values: pd.Series, threshold: float = 0.05) -> str:
+    regions = p_values.index[p_values < threshold].tolist()
+    if not regions:
+        return (
+            "No statistically significant changes were found between the periods "
+            f"at the ${threshold:g}$ significance level."
+        )
+    names = regions[0]
+    if len(regions) > 1:
+        names = ", ".join(regions[:-1]) + (
+            " and " if len(regions) == 2 else ", and "
+        ) + regions[-1]
+    return f"Statistically significant changes were found for {names} ($p < {threshold:g}$)."
+
+
 def main():
     env = Environment(
         autoescape=False,
@@ -293,6 +308,16 @@ def main():
                     index_col=[0, 1],
                 ),
                 cover_fit=yaml.safe_load(in_cover_fit),
+                period_changes=significant_period_changes(
+                    pd.read_csv(
+                        snakemake_fallback(
+                            "input",
+                            "period_p_values",
+                            str(project_path("results", "result__period_comparison_p_values.csv")),
+                        ),
+                        index_col="region",
+                    )["p_value"]
+                ),
                 tabA2=in_tabA2.read(),
             ).replace("\\cs", "\\mbox{CryoSat-2}")  # avoid macro-usage
         )
