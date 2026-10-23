@@ -72,7 +72,14 @@ def format_single_MB_val(value: float, prec: int, absolute: bool = False) -> str
 
 
 def format_single_percentage(value: float, prec: int) -> str:
-    return f"${100*value:.{prec}f}$"r"~\unit{\%}"
+    formatted = f"{100*value:.{prec}f}"
+    # Avoid implying none or all when rounding a proportion between the endpoints.
+    if 0 < value < 1:
+        if float(formatted) == 0:
+            formatted = f"<{10**-prec:.{prec}f}"
+        elif float(formatted) == 100:
+            formatted = f">{100 - 10**-prec:.{prec}f}"
+    return f"${formatted}$"r"~\unit{\%}"
 
 
 def prepend_figure_path(filename: str) -> str:
