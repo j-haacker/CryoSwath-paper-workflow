@@ -9,7 +9,7 @@
 %% Please use the following documentclass and journal abbreviations for preprints and final revised papers.
 
 %% 2-column papers and preprints
-\documentclass[essd, manuscript]{copernicus}
+\documentclass[eo, manuscript]{copernicus}
 
 
 %% \usepackage commands included in the copernicus.cls:
@@ -32,7 +32,7 @@
 
 % \Author[affil]{given_name}{surname}
 
-\Author[1,2][j.m.haacker@tudelft.nl]{Jan}{Haacker} %% correspondence author
+\Author[1,2][jan.haacker@boku.ac.at]{Jan}{Haacker} %% correspondence author
 \Author[1][bert.wouters@tudelft.nl]{Bert}{Wouters}
 
 \affil[1]{Delft University of Technology, Delft, The Netherlands}
@@ -68,8 +68,8 @@
 
 \begin{abstract} % TC:break abstract
 Mountain glaciers are projected to lose between 26 and 41~\unit{\%} of
-their volume from 2015 until 2100 depending on the assumed greenhouse
-gas emission trajectory.
+their mass from 2015 until 2100 depending on the assumed global
+temperature change scenario.
 Melting glacier ice contributes to sea-level rise and reduces terrestrial
 freshwater storage.
 Monitoring glacier change contributes to the evidence base that can help
@@ -77,7 +77,10 @@ affected communities assess whether adaptation is necessary and identify
 appropriate measures.
 We introduce the open-source Python package CryoSwath, which estimates
 glacier surface elevations from freely available \cs{} altimetry data.
-Further, we present and analyze a CryoSwath-produced dataset of monthly sampled, three-month rolling-window
+Alongside, we establish a process-informed interpolation method and
+estimate uncertainty correlations from systematic comparison to a
+photogrammetry-based reference (ArcticDEM strips).
+Further, we present a CryoSwath-produced dataset of monthly sampled, three-month rolling-window
 glacier surface elevation estimates at a 500~\unit{m} resolution
 covering nearly all glaciated areas in the Arctic during the period 2010
 to 2024.
@@ -89,11 +92,11 @@ of \VAR{trends[("Arctic-wide", "___")]|r2v("mass")|fmt(absolute=True)}.
 The dataset opens research opportunities to study these changes in detail
 and to contextualize the glacier response to variability in atmospheric
 or oceanic forcing.
-The open software enables non-expert researchers from different fields for the first time to
-efficiently process \cs{} data at a large scale over glaciated regions
-and inspect the data at every processing stage in detail.
+The open software enables non-expert researchers from different fields to
+efficiently process \cs{} data at scale over glaciated regions
+and inspect the data at intermediate processing stages.
 The user has full control over the processing and, with that, the means
-to derive any parameter of interest.
+to derive and output non-default quantities.
 \end{abstract}
 
 
@@ -110,6 +113,9 @@ local freshwater availability, ecosystems, and economic activities,
 and may trigger hazards like flooding and landslides. Monitoring
 glaciers to improve our understanding of their current and future
 behavior is, thus, both of great scientific and societal interest.
+\citet{rounce2023GlobalGlacierChange} project glacier mass losses of
+26 to 41~\unit{\%} between 2015 and 2100 for global warming scenarios
+of 1.5 to 4~\unit{\degree C} relative to preindustrial levels.
 
 In-situ measurements of glacier mass balance provide invaluable
 information on the state of mountain glaciers, yet can only cover a
@@ -161,7 +167,10 @@ sparser spatiotemporal coverage compared to radar altimetry.
 While the footprint and accuracy of early radar missions was
 insufficient to study mountain glaciers, this changed with the launch of
 the first SARIn (see below) altimeter, \cs, the European Space Agency's (ESA) mission dedicated to measuring
-surface elevation changes in the cryosphere. This mission, for the first
+surface elevation changes in the cryosphere
+\citep{wingham2006CryoSatMissionDetermine}. The original mission design
+targeted sea ice and large ice sheets
+\citep{drinkwater2004EuropeanSpaceAgencys}. This mission, for the first
 time, also measured the angle of arrival of the echo in the so-called
 SARIn mode, using a second antenna that is mounted perpendicular to the
 direction of flight, allowing to precisely geolocate the echo point in
@@ -176,11 +185,15 @@ elevation measurements by an order of magnitude.
 \citet{gray2013InterferometricSwathProcessing} proved the
 concept---which became known as ``swath processing''---and its
 applicability to \cs{} data and mountain glaciers. Today, there is a
-large body of studies that rely on \cs{} swath elevation estimates. ESA
-provides swath elevation data to the public, but these are currently
-only available for a limited number of regions, and with limited
-auxiliary data such as power and coherence that help to
-interpret the data. Furthermore, the standard workflow applied to the
+large body of studies that rely on \cs{} swath elevation estimates
+\citep{foresta2016SurfaceElevationChange, foresta2018HeterogeneousRapidIce,
+jakob2021SpatiallyTemporallyResolved, jakob2023GlacierMassLoss}. ESA
+provides public point and gridded elevation products through CryoTEMPO-EOLIS,
+including uncertainty estimates. The Baseline 3 point-product variables
+listed in its handbook (Issue 4.1) do not include waveform power or coherence
+\citep{cryotempo-eolis2026CryoTEMPOEOLISProductHandbook}. Access to these
+products does not provide control over the processing choices used to
+derive them. Furthermore, the standard workflow applied to the
 \cs{} waveforms to derive surface elevations may not always align with
 the needs of the end user, when they want to perform advanced analyses.
 
@@ -200,7 +213,7 @@ CryoSwath 0.2.2 and time series of average surface elevation changes.
 
 In this section, we introduce the datasets that we build on. These are
 ESA's \cs{} SARIn L1b product at baseline E
-\citep{europeanspaceagency2023L1bSARinPrecise}, the digital elevation
+\citep{europeanspaceagency2019L1bSARinPrecise}, the digital elevation
 model (DEM) ArcticDEM at version 4.1
 \citep{porter2023ArcticDEMMosaicsVersion}, and glacier outlines and
 other data of the Randolph Glacier Inventory (RGI) at version 7.0
@@ -231,26 +244,38 @@ Comparing the recordings of both yields a phase difference that allows us
 to determine the across-track direction to the origin of the reflected
 signal. SARIn mode is active over glaciers and, further, is a
 prerequisite for swath processing since only SARIn delivers the critical
-phase difference information.
+phase difference information. SARIn acquisition is governed by ESA's
+geographic mode mask, so glacier coverage is limited to areas observed
+in this mode \citep{europeanspaceagency2023NewCryoSatGeographical}.
 
-In SARIn mode, \cs{} sends and receives 20 coherent signal bursts per
+In SARIn mode, \cs{} sends and receives about 21 coherent signal bursts per
 second.
-Each burst consists of pulses at a pulse repetition frequency of about
+Each burst consists of 64 pulses at a pulse repetition frequency of about
 18~\unit{kHz}.
-The L1b product contains 20 data aggregates per second. Each aggregate
-contains information of up to 64 bursts illuminating a
-delay/Doppler-sharpened \citep{raney1998DelayDopplerRadar} roughly 400~\unit{m} along-track and 15~\unit{km} across-track footprint (half-power
-beam width)
-within a 240~\unit{m} range window.
-The aggregated information includes power, coherence, and phase
-difference recordings over time.
-These data constitute a ``waveform'' that is made of 1024 samples,
-potentially bearing information about the surface at some location.
+Using delay/Doppler processing \citep{raney1998DelayDopplerRadar}, the
+echoes of each burst are separated along-track into 64 Doppler beams,
+illuminating narrow footprints of roughly 400~\unit{m} along-track
+and 15~\unit{km} across-track (half-power beam width).
+In the range direction, the measurement window spans about 240~\unit{m}.
+As \cs{} moves along its orbit, each ground location is observed by
+Doppler beams from successive bursts, typically yielding about 50 -- 60
+individual looks in SARIn mode.
+These are aligned and averaged to reduce noise (``multilooking'').
+The L1b product provides about 20 multilooked ``waveforms'' per second,
+each containing the aggregated information for one ground location.
+The L1b data include power, coherence, and phase difference recordings
+in 1024 samples over the range window, potentially each bearing
+information about the surface at some location.
 Note that the data are oversampled by a factor of 2 and that neighboring
 samples are related to each other.
 If the recorded power is much larger than the noise, we attempt to
 recover the reflection's origin.
 
+ESA also distributes processed elevations through
+\href{https://cryotempo-eolis.org/}{CryoTEMPO-EOLIS}
+\citep{gourmelen2018CryoSat2SwathInterferometric,
+jakob2023GlacierMassLoss, cryotempo-eolis2026CryoTEMPOEOLISProductHandbook}.
+CryoSwath derives its elevations directly from the L1b waveforms.
 
 \subsection{Reference topography}
 
@@ -293,18 +318,12 @@ rasterized surface elevation change rates. We explain the algorithm
 in this section, starting from the input data, describing echo
 geolocation, resolving the phase ambiguity, rasterizing point elevation
 estimates, fitting a trend model, interpolating voids, and computing
-regional mass change time series.
-\begin{sidewaysfigure}
-    \includegraphics{\VAR{"fig01__Algorithm_flowchart.pdf"|fig}}
-    \caption{%
-        Flowchart of the algorithm to compute monthly rasterized surface
-        elevation estimates and rasterized linear trends of the surface
-        elevation. The items refer to the main text and should be
-        understood in their context.
-    }
-    \label{fig:flowchart}
-\end{sidewaysfigure}
-The flowchart in Fig.~\ref{fig:flowchart} offers an overview.
+regional mass change time series. Echo geolocation and phase ambiguity
+resolution build on established swath processing methods
+\citep{gourmelen2018CryoSat2SwathInterferometric,
+garcia-mondejar2019MultisurfaceRetrackerSwath}, with CryoSwath's
+modifications described below.
+The flowchart in Appendix Fig.~\ref{fig:flowchart} provides an overview of the workflow.
 Note that the most recent release of its Python
 implementation can be found on GitHub at
 \href{https://github.com/j-haacker/cryoswath}{\texttt{\small
@@ -317,14 +336,18 @@ The version used for the present data is 0.2.2.
 
 
 \subsection{Data selection}
+\label{sec:algo:data_selection}
 
 With the L1b data product, ESA provides indicators (flags) that help to recognize
 potentially bad data.
 We discard waveforms that are flagged with one or more of the
 ``measurement confidence data'' flags (\verb|flag_mcd_20_ku|)
-stated in Table~\ref{tab:mcd_flags} to
+stated in Table~\ref{tab:mcd_flags}
+\citep{scagliola2020CryoSatIceNetCDF} to
 reduce the risk of polluting the dataset with erroneous measurements.
 While this is CryoSwath's default choice, it allows any user-defined selection.
+These are ESA's input flags; the coherence, power, and swath-start
+criteria below are CryoSwath's configurable filtering choices.
 To reduce computational costs, we exclude waveforms where the
 satellite's ground position is 30~\unit{km} or further away from any
 glacier because the antenna gain is
@@ -435,6 +458,7 @@ noise power estimate.
 
 
 \subsection{Apparent echo origin location}
+\label{sec:algo:geolocation}
 
 \begin{figure}[t]
     \includegraphics[width=8.3cm]{\VAR{"fig03__geometry_sketch.png"|fig}}
@@ -450,9 +474,7 @@ noise power estimate.
     \label{fig:sketch}
 \end{figure}
 
-While calculating the location of the echo origin only involves basic
-algebra, we will still elaborate on the essential equations. Please
-refer to the sketch in Fig.~\ref{fig:sketch} for visual guidance.
+Please refer to the sketch in Fig.~\ref{fig:sketch} for visual guidance.
 Note that we can only retrieve the apparent, i.e., the calculated echo
 origin, which can differ from the actual one for a number of reasons
 (see Sect.~\ref{sec:errors}).
@@ -486,50 +508,9 @@ antenna centers $b$, the signal frequency $f_\text{Ku}$, and the phase differenc
 $\theta = \arcsin\left(
     \frac{\Delta\beta \cdot c}{f_\text{Ku} \cdot 2\pi\cdot b}
     \right) - \chi$.
-The angle $\theta$ is on the order of 1\textdegree{}.
+The angle $\theta$ is on the order of 1~\unit{\degree}.
 
-Below, we will calculate the echo origin location using the satellite
-position, its travel direction, the great-circle distance to the echo
-origin, and its elevation above the reference ellipsoid. The last two of
-the four are not yet known. With Eq.~\ref{eq:Pscat}, we start off by
-calculating the length of $\vec{P_\text{scat}}$. We then compute the
-angle $\Delta \zeta$ between $\vec{P_\text{CS2}}$ and
-$\vec{P_\text{scat}}$ in Eq.~\ref{eq:delZeta}.
-We continue in Eq.~\ref{eq:curvature} \citep[Ch.~4,
-Eq.~4.15]{torge2012Geodesy} by calculating the Earth's radius of
-curvature $r$ at nadir in the prime vertical plane. This is a good
-approximation because at the poles where the angle between \cs's
-across-track direction and the prime vertical plane is largest, the
-meridional radius of curvature approaches the radius of curvature in the
-prime vertical plane.
-Here, $a$ and $e$ refer to the WGS84 semi-major axis length and the
-eccentricity, respectively.
-Next, we calculate the elevation of the echo origin $h$ in
-Eq.~\ref{eq:elevation}.
-Lastly, in Eq.~\ref{eq:offNadirD}, we approximate the ellipsoidal
-distance between nadir and the echo origin by the great-circle distance
-$d_\text{off}$ with the curvature at nadir.
-
-\begin{gather}
-    \begin{split}
-        |\vec{P_\text{scat}}| & = \sqrt{(\vec{P_\text{CS2}}-(\vec{P_\text{CS2}}-\vec{P_\text{scat}}))^2} \\
-            & = \sqrt{|\vec{P_\text{CS2}}|^2
-          - 2\cdot \cos(\theta) \, |\vec{P_\text{CS2}}| \, \overline{P_\text{CS2}P_\text{scat}}
-            + \overline{P_\text{CS2}P_\text{scat}}^2} \label{eq:Pscat}
-    \end{split} \\
-    \Delta \zeta = \arctan\left(
-        \frac{|\vec{P_\text{scat}}| \, \sin(\theta)}{|\vec{P_\text{CS2}}| - |\vec{P_\text{scat}}| \, \cos(\theta)}
-        \right) \label{eq:delZeta} \\
-    r = \frac{a}{\sqrt{1-e^2\sin^2(\phi)}} \label{eq:curvature} \\
-    h = |\vec{P_\text{scat}}| - r \label{eq:elevation} \\
-    d_\text{off} = r \cdot \Delta \zeta \label{eq:offNadirD}
-\end{gather}
-
-Now, having \cs's coordinates $\phi$ and $\lambda$, the direction to the
-echo origin $\alpha + 90\unit{^\circ}$, and the great-circle distance
-$d_\text{off}$ between nadir and the echo origin, we use \texttt{pyproj}
-\citep{snow2025Pyproj4Pyproj371} to compute the echo-origin
-coordinates.
+The coordinate derivation is given in Appendix~\ref{app:geolocation}.
 
 For the current dataset, actually, we low-pass filter the phase difference
 before calculating the echo origins as described above.
@@ -539,9 +520,9 @@ The default used here is a Gaussian-weighted average over a
 rolling window of 21 samples with a standard deviation of 5 samples.
 The chosen low-pass filter balances reducing fluctuations that increase
 when the received power decreases and maintaining a large number of
-independent elevation estimates by limiting the filter scope. Note that
-the results are robust with respect to the chosen filter, even with no
-low-pass filter applied.
+independent elevation estimates by limiting the filter scope.
+We explored different filter settings, including no low-pass filtering,
+and found the results to be robust.
 
 
 \subsection{Phase ambiguity}
@@ -558,7 +539,8 @@ $n\cdot2\pi$ ``off'', with $n\in\mathbb{Z}$. In consequence, there are a
 number of theoretically possible nadir-scatterer angles. To resolve this
 ambiguity, we compare the resulting possible scatterer locations to a
 DEM.
-We calculate possible locations for $n\in[-3..3]$ as described above and
+We calculate possible locations for $n\in[-3..3]$ as described in
+Appendix~\ref{app:geolocation} and
 deem the locations that are closer to the DEM more probable than those
 further away.
 In this section, we describe the implemented algorithm to
@@ -610,14 +592,7 @@ and the second, whether the samples resemble the shape of the reference.
 Subsequently, $n$ is chosen such that the sum of the squares of both is
 minimized. Therefore, those solutions that are far from the reference,
 or those that disagree on the shape, are penalized.
-CryoSwath accepts different optimization functions as an input argument.
-To resemble the original algorithm of
-\citet{garcia-mondejar2019MultisurfaceRetrackerSwath}, i.e., using only
-the absolute median as deviation measure, the user could simply pass
-\lstinline|lambda x: numpy.argmin(scipy.stats.median_abs_deviation(x))|
-using dependencies \texttt{NumPy}
-\citep{harris2020ArrayProgrammingNumPy} and \texttt{SciPy}
-\citep{virtanen2020SciPy10Fundamental}.
+CryoSwath accepts custom functions for selecting the phase-wrap factor.
 
 
 \subsection{Rasterization of point data} \label{sec:algo:rasterization}
@@ -674,15 +649,14 @@ follows in Eq.~\ref{eq:trend_with_season}.
 \begin{equation} \label{eq:trend_with_season}
     h_\Delta(t) = c + m \cdot t 
     + A_{\textrm{full}} \cos(2\pi \cdot t - \phi_{\textrm{full}})
-    + A_{\textrm{semi}} \cos(\pi \cdot t - \phi_{\textrm{semi}})
+    + A_{\textrm{semi}} \cos(4\pi \cdot t - \phi_{\textrm{semi}})
 \end{equation}
 In Eq.~\ref{eq:trend_with_season}, the independent variable $t$ is the time
 in years.
 Further, $c$ denotes a constant
 offset, $m$ is the surface elevation change trend, $A_{\textrm{full}}$ and $A_{\textrm{semi}}$ are
 the cycle amplitudes of the yearly and semi-yearly components,
-respectively, $i$ indicates the imaginary
-unit, the indexed $\phi$ are the cycle phases with indices as before.
+respectively, the indexed $\phi$ are the cycle phases with indices as before.
 
 Grid cell time step aggregates that are based on less than 4 point
 elevation estimates or those, where the interquartile range is larger
@@ -719,7 +693,9 @@ the same method. We explain our approach below in detail, structured in
 processing ``Steps''. The data products include flags that indicate how
 each cell was filled, with directly observed data being indicated by a
 flag value of zero. The flag values mostly match the following Step
-numbers, however, with exceptions in Step~2 and~3.
+numbers, however, with exceptions in Step~2 and~3. These output flags
+are distinct from ESA's input measurement-confidence flags used for data
+selection (Sect.~\ref{sec:algo:data_selection}).
 
 \textbf{Step 1:} In a first step, for those
 grid cells where a model could be fitted (see previous section) all
@@ -766,8 +742,8 @@ for individual basins (flag value two) and, then, for groups of basins
 (flag value 3) that are chosen along termination type, latitude, and
 longitude. More specifically, the termination types are read from RGI
 and are either ``marine-terminating'' or ``unclassified''. Further, the
-groups span one degree of latitude at most and, similarly, at most one
-degree of longitude times cosine of latitude (to maintain the same scale
+groups span about 1~\unit{\degree} latitude and 1~\unit{\degree} longitude divided by the cosine of latitude (to
+maintain the same scale
 across different latitudes). Repeating the Steps~3.1--3.5 for groups of
 basins is necessary if there are insufficient data for individual
 basins. In fact, there can be cases in which even for the basin groups
@@ -824,7 +800,7 @@ effective number of observations is 6 or larger.
 require weighted averages for at least five elevation bands.
 We use the ridge regression implementation of \texttt{scikit\allowbreak-learn}
 \citep{pedregosa2011ScikitlearnMachineLearning,
-scikit-learndevelopers2025Scikitlearn} with the singular value
+scikit-learndevelopers2026Scikitlearn} with the singular value
 decomposition solver that allows weighting the observations, to fit the
 polynomial.
 Next to weighting the residuals which will be explained below, this
@@ -1177,7 +1153,7 @@ Table~\ref{tab:subreg_overview}). The total area uncertainty $u_A$ is
 calculated in Eq.~\ref{eq:err:area}.
 \begin{gather}
     e(s_i) = k e_1 s_i^p := 3 \cdot 0.039 \cdot s_i^{0.70} \label{eq:err:rgi_area} \\
-    u_{A2}(s_1,..,s_N) = \sum_i e(s_i) / \sum_i s_i \label{eq:err:rgi_sum} \\
+    u_{A2}(s_1,..,s_N) = \sum_i e(s_i) \label{eq:err:rgi_sum} \\
     u_A = \sqrt{u_{A1}^2 + u_{A2}^2} \label{eq:err:area}
 \end{gather}
 
@@ -1189,13 +1165,13 @@ trends $u_{\dot{h}}$ by two standard deviations of the fitted model
 parameter (Sect.~\ref{sec:algo:regional_trend}). Assuming a density
 uncertainty of glacial ice volume changes for long time scales
 $u_{\rho,\text{long}} = 60$~\unit{kg}~\unit{m^{-3}}
-\citep{huss2013DensityAssumptionsConverting}, the mass balance (MB)
-uncertainty $u_\text{MB}$ follows in Eq.~\ref{eq:errors:mass_balance}
+\citep{huss2013DensityAssumptionsConverting}, the mass balance ($\dot{M}$)
+uncertainty $u_{\dot{M}}$ follows in Eq.~\ref{eq:errors:mass_balance}
 from uncertainty propagation, with the surface elevation trend $\dot{h}$
 and other symbols like above.
 
 \begin{equation} \label{eq:errors:mass_balance}
-    u_\text{MB} = \sqrt{
+    u_{\dot{M}} = \sqrt{
         (A\rho \cdot u_{\dot{h}})^2
         + (A\dot{h} \cdot u_{\rho,\text{long}})^2
         + (\rho\dot{h} \cdot u_A)^2
@@ -1207,13 +1183,13 @@ define to start in September. For single years, we assume a larger
 density uncertainty of $u_{\rho,\text{short}} =
 150$~\unit{kg}~\unit{m^{-3}}
 \citep{huss2013DensityAssumptionsConverting}. For the mass change
-from year $t0$ to year $t1$, Equation~\ref{eq:errors:mass_change}
+from year $t0$ to year $t1$ with elevation change $\Delta h_{t0,t1}$, Equation~\ref{eq:errors:mass_change}
 follows from propagating the uncertainties.
 \begin{equation} \label{eq:errors:mass_change}
     u_{\Delta M} = \sqrt{
         (A\rho \cdot u_{t0,t1})^2
-        + (A\dot{h} \cdot u_{\rho,\text{short}})^2
-        + (\rho\dot{h} \cdot u_A)^2
+        + (A\,{\Delta h_{t0,t1}} \cdot u_{\rho,\text{short}})^2
+        + (\rho\,{\Delta h_{t0,t1}} \cdot u_A)^2
     }
 \end{equation}
 For single-year mass changes, the elevation change uncertainty
@@ -1242,6 +1218,14 @@ a flag that indicates the applied interpolation strategy.
 See the data availability section and the corresponding data description
 at the repository for the metadata in full detail.
 
+For comparison, the EOLIS monthly gridded product described for Baseline 3
+uses a 2~\unit{km} grid and a three-month rolling window, and includes
+elevation uncertainty. Its point product combines swath and POCA
+observations, identified by an \verb|is_swath| variable
+\citep{cryotempo-eolis2026CryoTEMPOEOLISProductHandbook}, whereas our
+dataset is swath-only. Finer grid spacing
+does not by itself establish greater observational accuracy.
+
 \subsection{Arctic-wide results}
 
 \begin{figure}[t]
@@ -1260,7 +1244,7 @@ to a glacier mass trend \VAR{trends[("Arctic-wide", "___")]|r2v("mass")|fmt}.
 Figure~\ref{fig:ts:arctic} shows the Arctic-wide trend and all components used
 to derive it (see Sect.~\ref{sec:algo:regional_trend}) separately for
 clarity.
-Moreover, Fig.~\ref{fig:ts:arctic} highlights the yearly mass balances.
+Moreover, Fig.~\ref{fig:ts:arctic} highlights the yearly elevation changes.
 The melt season of the hydrological year 2018/19 stands out with a mass
 loss of \VAR{coll.arctic_mass_18_19|fmt(absolute=True)}. This record
 mass loss has been attributed to anomalously warm air temperatures,
@@ -1294,11 +1278,12 @@ Figure~\ref{fig:ts:overview} shows the time series of average surface elevation 
 
 \begin{table*}[t]
     \caption{
-        Average mass balances and surface elevation trends per RGI o1
+        Average mass-balance rates and surface elevation trends per RGI o1
         region. The two columns titled ``Period comparison'' show values
         for the first and last four hydrological-year (September to
-        August) periods. The penultimate column shows the average mass
-        balance from August 2010 until December 2019 for comparison with
+        August) periods. The penultimate column shows the average
+        mass-balance rate from August 2010 until December 2019 for
+        comparison with
         the reference in the last column. The final, separated column
         shows reference mass balances from January 2010 until December
         2019 \citep{hugonnet2021AcceleratedGlobalGlacier}. The value
@@ -1311,341 +1296,19 @@ Figure~\ref{fig:ts:overview} shows the time series of average surface elevation 
 The trends for each first-order RGI region are summarized in
 Table~\ref{tab:regional_mass_balances}. The table includes a comparison
 of the periods August 2010 until August 2014 and August 2020 until
-August 2024, for which we did not find significant changes, with
-p-values larger than
-\VAR{coll.p_val_1014vs2024_svalbard_and_jan_mayen|fmt(prec=2)} (value for Svalbard). The periods were chosen to start in August
+August 2024.  \VAR{period_changes}
+The periods were chosen to start in August
 for consistency with the chosen time steps
 (Sect.~\ref{sec:algo:regional_trend}) and good alignment with the
 hydrological years (September to August).
-
-\subsection{Alaska}
-
-\begin{figure*}[t]
-    \includegraphics[width=12cm]{\VAR{"fig06__map_trend_alaska.png"|fig}}
-    \caption{
-        Surface elevation change rate of glaciers in Alaska from July
-        2010 to November 2024. The geographic location of the inset (b)
-        is indicated with an arrow to the left, the other inset location
-        is given by the green frame.
-    }
-    \label{fig:map:alaska}
-\end{figure*}
-Alaska is the region with the most negative mass balance, i.e., \VAR{trends[("Alaska", "___")]|r2v("mass")|fmt} ($p\ll10^{-3}$), continuing
-the $-75\pm11$~\unit{Gt}~\unit{yr^{-1}} trend reported for the period
-1993--2013 \citep{larsen2015SurfaceMeltDominates}.
-On average, the surface decreased \VAR{trends[("Alaska", "___")]|r2v("spec")|fmt(absolute=True, prec=2)}.
-Figure~\ref{fig:map:alaska} gives an overview of the surface elevation trends.
-This shows that, in the proximity of the Gulf of Alaska, the
-elevation trends reach $-5$~\unit{m}~\unit{yr^{-1}}.
-As a driver of the ice loss, \citet{jakob2021SpatiallyTemporallyResolved},
-who found a similar trend of $-76.3\pm5.7$~\unit{Gt}~\unit{yr^{-1}} between 2010 and 2020,
-point to a negative-to-positive change of the PDO index that would have
-resulted in an increase in surface air temperature, raising the
-meltwater production and lowering the surface mass balance.
-However, \citet{wendler2017PrecipitationPrecipitationChange} reports a
-positive correlation between the surface air temperature and the January
-precipitation, complicating the relation between the PDO index and the surface
-mass balance since this implies not only enhanced melting but also enhanced snowfall.
-Since the hydrological year 2019/20, the PDO was in a negative phase
-according to data of the National Oceanic and Atmospheric Administration
-(NOAA) \citep{newman2016PacificDecadalOscillation}.
-We indeed observe a slower ($p=\VAR{coll.alaska_p_1019_1924|fmt("value", prec=2, in_math=True)}$) mass loss in the period from August
-2019 until November 2024 compared to August 2010 until August 2019 (\VAR{coll.alaska_mass_19_24|fmt("nounits", absolute=True)} vs
-\VAR{coll.alaska_mass_10_19|fmt(absolute=True)}), strengthening the hypothesis that
-a larger PDO index is associated with a lower surface mass balance.
-
-In the green inset, we zoom in on glaciers that show the strongest changes.
-Pronounced surface lowering is observed in the lower reaches of Tana
-Glacier, as well as in the Steller lobe and Bering lobe, reaching up to
-$10.1\pm0.7$~\unit{m}~\unit{yr^{-1}}, together with mostly negative
-elevation trends with intermittent positive patches in the
-debris-covered ice between these two lobes. Near-zero to slightly
-positive elevation changes are found in the Bagley Ice Valley. Further
-to the East, widespread surface lowering at rates faster than
-1~\unit{m}~\unit{yr^{-1}} occurs on the Seward and Agassiz glaciers
-(often
-collectively referred to as Malaspina Glacier), with thinning rates
-exceeding 5~\unit{m}~\unit{yr^{-1}} at the glacier fronts.
-
-\subsection{Arctic Canada North}
-
-Following Alaska, glaciers in the regions Arctic Canada North and South, Greenland
-Periphery, Svalbard, and the Russian Arctic thin similarly fast.
-Arctic Canada North contains the largest glacierized area among these
-regions, with 105,370~\unit{km^2}.
-On average, here the glacier surface decreases at a rate of
-\VAR{trends[("Arctic Canada North", "___")]|r2v("spec")|fmt(absolute=True, prec=2)}.
-\begin{figure}[t]
-    \includegraphics[width=8.3cm]{\VAR{"fig07__map_trend_arctic_canada_north.png"|fig}}
-    \caption{Surface elevation change rate from July 2010 to November
-        2024 of glaciers in Arctic Canada North. Inset (b) contains glaciers on Melville Island. The geographic
-        location of the inset (b) is indicated with an arrow inside the
-        main panel (a).}
-    \label{fig:map:arctic_canada_north}
-\end{figure}
-Ice caps in Arctic Canada North show similar patterns across the region
-(Fig.~\ref{fig:map:arctic_canada_north}), with surface changes in the order
-of $-0.5$~\unit{m}~\unit{yr^{-1}} at the margins, and intermediate to
-near-zero lowering at higher elevations. On Manson Icefield and the
-southern parts of Prince of Wales Icefield moderate surface increases
-(0.1 and 0.6~\unit{m}~\unit{yr^{-1}}, respectively) are observed. A
-number of single glaciers, such as Wykeham Glacier, Mittie Glacier, the
-southeast glaciers on Devon Ice Cap and the tongue of Iceberg Glacier on
-Müller Ice Cap show particularly pronounced negative elevation changes,
-reaching up to 3~\unit{m}~\unit{yr^{-1}}.
-
-\subsection{Arctic Canada South}
-
-\begin{figure}[t]
-    \includegraphics[width=8.3cm]{\VAR{"fig08__map_trend_arctic_canada_south.png"|fig}}
-    \caption{Surface elevation change rate from July 2010 to November
-        2024 of glaciers in Arctic Canada South. The blue- and
-        green-framed insets focus on Barnes Ice Cap and Penny Ice Cap,
-        respectively. The elevation trends of glacier tongues labeled A,
-        B, C, and D are uncertain because of insufficient coverage.
-        These are South West, South, Coronation, and Maktak Glaciers,
-        respectively \citep{ward1954PartDescriptionPenny}. The
-        geographic location of the inset (b) is
-        indicated with an arrow inside the main panel (a).
-    }
-    \label{fig:map:arctic_canada_south}
-\end{figure}
-With 40,538~\unit{km^2} glacierized area, Arctic Canada South is
-substantially smaller than Arctic Canada North. But with a higher
-average surface elevation change of
-\VAR{trends[("Arctic Canada South", "___")]|r2v("spec")|fmt(prec=2)}, it lost an
-almost equal amount of ice in the observational period (\VAR{trends[("Arctic Canada South", "___")]|r2v("mass")|fmt("nounits", absolute=True, prec=0)} vs
-\VAR{trends[("Arctic Canada North", "___")]|r2v("mass")|fmt(absolute=True, prec=0)}, Table~\ref{tab:regional_mass_balances}).
-Figure~\ref{fig:map:arctic_canada_south} shows the average surface
-trends.
-We highlight the two largest ice caps, Barnes Ice Cap and Penny Ice Cap.
-Barnes Ice Cap on its own lost \VAR{coll["barnes"]|r2v("mass")|fmt(absolute=True)}
-with a surface decrease of \VAR{coll["barnes"]|r2v("spec")|fmt(prec=2, absolute=True)}
-between 2010 and 2024.
-Penny Ice Cap lost \VAR{coll["penny"]|r2v("mass")|fmt(absolute=True)}
-(\VAR{coll["penny"]|r2v("spec")|fmt(prec=2, absolute=True)}) during the same period.
-Elevation changes are particularly negative in the northwestern marginal
-zone, as well as in three of the southernmost glaciers terminating in
-proglacial lakes. Owing to the presence of a perennial firn layer,
-surface rates at higher elevations are much less pronounced compared to
-Barnes Ice Cap. Note that the tongues of South West, South, Coronation,
-and Maktak Glaciers \citep{ward1954PartDescriptionPenny} were poorly
-covered by \cs{} data, and modeled surface mass balances were between
-$-2$ and $2$ meter water equivalent per year in the period 2010 to 2014
-\citep{schaffer2023ModelingSurfaceMass}.
-
-\subsection{Greenland Periphery}
-
-\begin{figure*}[t]
-    \includegraphics[width=12cm]{\VAR{"fig09__map_trend_greenland.pdf"|fig}}
-    \caption{
-        Glacier surface elevation change rate in Greenland Periphery
-        from July 2010 to November 2024. The blue-framed inset focuses on
-        Flade Isblink Ice Cap and the green-framed inset focuses on
-        Sukkertoppen and Qarajugtoq Ice Caps, and one unnamed ice
-        complex (RGI ID 8741).}
-    \label{fig:map:greenland}
-\end{figure*}
-The glaciers in the periphery of Greenland's ice sheet show a surface
-decrease of \VAR{trends[("Greenland Periphery",
-"___")]|r2v("spec")|fmt(prec=2, absolute=True)} on average; however,
-with locally diverse trends, reflecting the region's large extent
-(see Fig.~\ref{fig:map:greenland}).
-North Greenland lost \VAR{grnl[("North Greenland",
-"___")]|r2v("mass")|fmt(absolute=True)} and its surface lowered by
-\VAR{grnl[("North Greenland", "___")]|r2v("spec")|fmt(prec=2,
-absolute=True)}. Isolated
-locations of elevation gain can be observed in the northwestern part of
-Flade Isblink Ice Cap (blue box in Fig.~\ref{fig:map:greenland}) near
-the front of two glaciers feeding into the neighboring ice shelf.
-Further toward the central part of the ice cap, the surface decreases.
-This pattern can be linked to changes in the local ice dynamics,
-following the cessation of the 1996--2001 surge of these two glaciers
-\citep{rinne2011RecentElevationChanges, moller2022GroundingLineRetreat}.
-The surface in West Greenland decreased by
-\VAR{grnl[("West Greenland", "___")]|r2v("spec")|fmt(prec=2,
-absolute=True)}, and the subregion's mass loss amounted to
-\VAR{grnl[("West Greenland", "___")]|r2v("mass")|fmt(absolute=True)}.
-Regionally, the strongest lowering occurred in Southwest Greenland. The
-subregion's surface lowered \VAR{grnl[("South West Greenland",
-"___")]|r2v("spec")|fmt(prec=2, absolute=True)} and
-its mass balance was \VAR{grnl[("South West Greenland", "___")]|r2v("mass")|fmt} on average.
-Especially, Sukkertoppen and Qarajugtoq Ice Caps, and one unnamed ice
-complex (RGI ID 8741) collectively lost
-\VAR{coll["sukkerqara"]|r2v("mass")|fmt(absolute=True)} (green box in
-Fig.~\ref{fig:map:greenland}). Their surface decreased at a rate of
-\VAR{coll["sukkerqara"]|r2v("spec")|fmt(prec=2, absolute=True)} on
-average. Greenland's Southeast lost \VAR{grnl[("South East Greenland",
-"___")]|r2v("mass")|fmt(absolute=True)} and its surface decreased
-\VAR{grnl[("South East Greenland", "___")]|r2v("spec")|fmt(prec=2,
-absolute=True)}. The smallest
-surface decrease occurred in the East with
-\VAR{grnl[("East Greenland", "___")]|r2v("spec")|fmt(prec=2,
-absolute=True)}. There, the mass loss amounted to
-\VAR{grnl[("East Greenland", "___")]|r2v("mass")|fmt(absolute=True)}.
-
-% what to do with the Khan comparison?
-% The mass loss estimates, especially, for West and East Greenland deviate
-% from the earlier reported $6.9\pm0.9$ and $9.4\pm2.7$~\unit{Gt}
-%~\unit{yr^{-1}}, respectively, derived from laser altimetry for the
-% period from 2008 until 2019 \citep{khan2022AcceleratingIceLoss}.
-% --> ignore for now: as for Iceland, the discrepancy may be caused
-% by a shift of the scattering horizon
-
-% what to do with Bert's comment concerning Brice 2019?
-% For the high mass loss in the northwest, you can use Brice's paper: "In
-% the southwest, persistent high atmospheric pressure reduced cloudiness,
-% increasing runoff through enhanced absorption of solar radiation; in
-% contrast, increased early-summer cloudiness in north Greenland enhanced
-% atmospheric warming through decreased longwave heat loss."
-% --> the compared periods are much longer and much earlier, the conclusions
-% do not apply here.
-
-\subsection{Svalbard}
-
-\begin{figure*}[t]
-    \includegraphics[width=12cm]{\VAR{"fig10__map_trend_svalbard.png"|fig}}% issues in pdf (callouts partly invisible)
-    \caption{Surface elevation change rate from July 2010 to November
-        2024 of glaciers in Svalbard. The labeled glaciers are referred
-        to in the main text.}
-    \label{fig:map:svalbard}
-\end{figure*}
-Svalbard, which is less than 500~\unit{km} off Greenland's east coast at
-a latitude of about 80\unit{^\circ}~\unit{N}, by contrast undergoes substantial
-changes (see Fig.~\ref{fig:map:svalbard}) with an average surface lowering
-of \VAR{trends[("Svalbard and Jan Mayen",
-"___")]|r2v("spec")|fmt(prec=2, absolute=True)} and mass loss of
-\VAR{trends[("Svalbard and Jan Mayen",
-"___")]|r2v("mass")|fmt(absolute=True)} during the observational period.
-Multiple glaciers on Svalbard show thinning at higher elevations and
-thickening at the glacier fronts, indicating surge phases that, indeed,
-were reported earlier.
-Those are Wahlenbergbreen \citep{sevestre2018TidewaterGlacierSurges},
-Penckbreen and Sveitsarfonna
-\citep{mccerery2024TerrestrialGlacialGeomorphology},
-Morsjnevbreen/Strongbreen \citep{kaab2023GlobalClusteringRecent},
-and Recherchebreen \citep{kavan2024GlacierSurgeTrigger}.
-Arnesenbreen \citep{kaab2023GlobalClusteringRecent} shows the same
-signature, but less evident.
-On Austfonna, the most pronounced surge patterns are seen on
-Storisstraumen (also known as Basin-3) and the neighboring Basin-2
-\citep{dunse2015GlaciersurgeMechanismsPromoted,
-morris2022CryoSat2InterferometricMode}. Further to the East, surface
-lowering reaches far inland in three unnamed glacier basins, with
-elevation gain and surge signs in the easternmost Basin-7, which
-indeed surged between 2019 and 2020 \citep[Fig.~12, and
-personal communication, 14 November
-2025]{li2024HighresolutionCalvingFront}.
-Bråsvellbreen, which surged between 1936--1938
-\citep{bevan2007PositiveMassBalance}, shows extensive thinning near its
-front, similar to Leighbreen, which was identified as possibly being of
-surge type by \citet{dowdeswell1989DynamicsAustfonnaNordaustlandet}.
-Stonebreen shows a surge-like signature in the southern part, but this
-was reported to be caused by grounding line changes
-\citep{strozzi2017FrontalDestabilizationStonebreen}.
-Lilliehøøkbreen also shows a surge-like signature.
-However, the signature is not very pronounced and no reports on recent
-surges are available to our knowledge. This pattern may indicate that
-Lilliehøøkbreen is in an initial stage of surging.
-In addition to the surging glaciers, there are many glaciers that show
-mass loss, mostly at lower elevations.
-Marine-terminating glaciers, especially in the South and in the West, show
-stronger change signals than those further inland.
-Austfonna shows slight volume gains at higher elevations, except for the
-surging basins, reported above.
-
-\subsection{Russian Arctic}
-
-\begin{figure*}[t]
-    \includegraphics[width=12cm]{\VAR{"fig11__map_trend_russian_arctic.pdf"|fig}}
-    \caption{
-        Surface elevation change rate from July 2010 to November 2024 of
-        glaciers in the Russian Arctic. Panels (a), (b), and (c) show
-        the subregions Severnaya Zemlya, Franz Josef Land, and Novaya
-        Zemlya, respectively. The labeled glaciers are referred to in
-        the main text.
-    }
-    \label{fig:map:russian_arctic}
-\end{figure*}
-The glaciers in the Russian Arctic
-(Figure~\ref{fig:map:russian_arctic}) generally evolved similarly to the
-glaciers on Svalbard. Mass loss is almost ubiquitous, except for Windy
-Ice Cap in the east of Franz Josef Land that shows slight surface
-increase (Figure~\ref{fig:map:russian_arctic}b). Multiple glaciers of
-the Academy of Science Ice Cap show signs of surging, reported earlier
-by \citet{wytiahlowsky2023RemoteSensingGlacier}. For Vavilov Ice Cap, we
-find a complex signature of losses and apparent gains. Vavilov Ice Cap
-has been surging in the past, maintaining fast flow rates afterward and
-its recovery has been deemed unlikely due to the dry climatology
-\citep{willis2018MassiveDestabilizationArctic,
-zheng2019PossibleTransitionGlacial}. The observed signature includes
-apparent ice accumulation at the center of the ice cap. However, this
-accumulation is not visible in an earlier photogrammetry-derived
-elevation change dataset \citep{hugonnet2021AcceleratedGlobalGlacier}
-and is, further, difficult to explain physically: the magnitude of the
-apparent rise is on the same order as the nearby thinning due to the
-surge. Unlike surges, gravity-driven flow processes cannot contribute to
-raising the surface at the ice cap's peak. Accumulation of snowfall,
-then again, usually does not lead to surface increases at this
-magnitude. Alternatively, this observation could result from
-range-ambiguity errors (Sect.~\ref{sec:errors:location}c). E.g., suppose
-that earlier point elevation estimates were falsely located underneath
-the true surface (or better scattering horizon) because of competing
-echo contributions from the left and right sides of the ice cap
-\citep{haacker2023SystematicErrorsObserved}, while later point elevation
-estimates are not or are less often falsely located. In such a case, an
-apparent surface elevation increase could be observed. The topography of
-Vavilov Ice Cap could have changed due to the surge such that falsely
-located point elevation estimates occur at a different location, or occur
-less often for later time steps, potentially explaining the observation
-in analogy to the previous thought experiment.
-Figure~\ref{fig:app:vavilov}b shows a monthly time series of the average
-surface elevation differences relative to ArcticDEM across those cells
-that show a trend larger than 1~\unit{m}~\unit{^{-1}} (more detail in
-App.~\ref{app:vavilov}), lending credibility to the hypothetical origin
-of the observation.
-% TODO compare to ICESat data if feasible
-% Too uncertain: topo could cause errors
-% For the front of Bunge glacier in the North of Novaya Zemlya, we find a
-% contrasting pattern of thinning at the northern margin and thickening
-% for the southern part at the same time.
-On Novaya Zemlya (Fig.~\ref{fig:map:russian_arctic}c) widespread
-thinning can be observed at low elevations. The majority of the mass
-loss occurs in single years and was associated with atmospheric river
-episodes compounded with foehn events that deliver large amounts of
-sensible heat \citep{haacker2024AtmosphericriverinducedFoehnEvents}.
-
-\subsection{Iceland}
-
-\begin{figure*}[t]
-    \includegraphics[width=12cm]{\VAR{"fig12__map_trend_iceland.pdf"|fig}}
-    \caption{Icelandic glaciers' surface elevation change rate from
-        July 2010 to November 2024. The geographic locations of the
-        insets (b) and (c) are indicated with arrows inside the main
-        panel (a).}
-    \label{fig:map:iceland}
-\end{figure*}
-Iceland's ice caps, especially Vatnajökull, thin at their margins while
-they thicken in their interiors (Fig.~\ref{fig:map:iceland}). The mass
-gains from interior thickening partly compensate for the losses at
-glacier fronts, leading to an overall mass balance of \VAR{trends[("Iceland",
-"___")]|r2v("mass")|fmt} (Table~\ref{tab:regional_mass_balances}).
-For Dyngjujökull, Brúarjökull, Síðujökull, Skeiðarárjökull, and
-Breidamerkurjökull of Vatnajökull we observe strong frontal thinning.
-Dyngjujökull, Brúarjökull, and Síðujökull show interior thickening at
-the same time. Skeiðarárjökull thickens only in the area between
-Dyngjujökull and Síðujökull, and for Breidamerkurjökull the thickening
-signal is absent. Mýrdalsjökull in Iceland's South shows a similar
-pattern. Further, we find strong thinning for the fronts of
-Hagafellsjökull East and West on Langjökull.
 
 \subsection{Scandinavia}
 
 \begin{figure}[t]
     \includegraphics[width=8.3cm]{\VAR{"fig13__map_trend_scandinavia.pdf"|fig}}
     \caption{
-        Scandinavian glaciers' thinning rate from July
-        2010 to November 2024. The three insets share the scale shown in
+        Scandinavian glaciers' thinning rate during
+        2010 -- 2024. The three insets share the scale shown in
         the green inset.
     }
     \label{fig:map:scandinavia}
@@ -1658,21 +1321,25 @@ Hagafellsjökull East and West on Langjökull.
 \label{tab:scan_spec}
 \VAR{tab02}
 \end{table}
-Scandinavia's glaciers thin at $0.48\pm0.07$~\unit{m}~\unit{yr^{-1}}
+Scandinavia's glaciers thin at \VAR{trends[("Scandinavia", "___")]|r2v("spec")|fmt(absolute=True)}
 (Fig.~\ref{fig:map:scandinavia}, Table~\ref{tab:regional_mass_balances}).
 We report the thinning rates of the seven largest ice caps separately in
 Table~\ref{tab:scan_spec}.
 Compared to other regions, the surface elevation shows a larger
 yearly cycle.
-To our knowledge, the current dataset is the first to include elevation
-estimates for Scandinavia from \cs. The sensor provides sufficient
-data for nearly half of the glacierized area
+The sensor provides sufficient data to estimate elevation trends
+directly, without interpolation, for nearly half of the glacierized area
 (\VAR{cover_df.at[("Scandinavia", "Southeast_Scandinavia"),
 "coverage"]|P(0)} Southeast, \VAR{cover_df.at[("Scandinavia", "Southwest_Scandinavia"),
 "coverage"]|P(0)} Southwest, \VAR{cover_df.at[("Scandinavia", "North_Scandinavia"),
 "coverage"]|P(0)} North Scandinavia).
 The agreement with \citet{hugonnet2021AcceleratedGlobalGlacier} (Table~\ref{tab:regional_mass_balances}), also spatially (not shown), lends
 further credibility.
+
+EOLIS includes Scandinavian point elevations, but Scandinavia is absent
+from the monthly gridded-product list in handbook Issue 4.1
+\citep{cryotempo-eolis2026CryoTEMPOEOLISProductHandbook}. Our dataset
+provides monthly sampled elevations on a 500~\unit{m} grid.
 
 
 \section{Discussion}
@@ -1683,7 +1350,7 @@ further credibility.
 
 \begin{table}[t]
     \caption{
-        Comparison of regional long-term mass balances from the current study with an earlier
+        Comparison of regional long-term mass-balance rates from the current study with an earlier
         study that also used swath-processed \cs{} data
         \citep[abbreviated as JG23 below]{jakob2023GlacierMassLoss}. The
         observational period was August 2010 until August 2020. The
@@ -1706,7 +1373,7 @@ dataset from photogrammetry at 100~\unit{m} resolution
 \citep{hugonnet2021AcceleratedGlobalGlacier} differ from the current
 study for a number of regions (Table~\ref{tab:regional_mass_balances}).
 The relative difference is largest for Iceland where they find a $-7.7
-\pm 0.6$~\unit{Gt}~\unit{y^{-1}} mass balance from January 2010 until
+\pm 0.6$~\unit{Gt}~\unit{y^{-1}} mass-balance rate from January 2010 until
 December 2019, while we only find \VAR{trends[("Iceland", "10_19")]|r2v("mass")|fmt(prec=1)}
 for a similar period from August 2010 until December 2019.
 The good agreement with the earlier \cs-based study of
@@ -1729,8 +1396,7 @@ for the observed difference.
         interpolated, all three panels show a dotted hatching. Notably,
         positive differences prevail (Panel c, bluish colors). While the
         strongest differences occur where trends were interpolated,
-        these explain only \VAR{vatna_df.ratio.interp|P(0)} of the average surface elevation
-        trend difference (see main text).}
+        these explain only \VAR{vatna_df.ratio.interp|P(0)} of the overall difference (see main text).}
     \label{fig:disc:iceland_spatial_comparison}
 \end{figure}
 We continue by comparing the two datasets spatially for the ice cap
@@ -1738,13 +1404,13 @@ Vatnajökull, Iceland, in the period 2010 until 2019
 (Fig.~\ref{fig:disc:iceland_spatial_comparison}).
 This ice cap accounts for about 70~\unit{\%} of the glacierized area
 in Iceland.
-We find a considerable overall mass balance difference of
+We find a considerable difference in the overall mass-balance rate of
 \VAR{coll.vatna.diff|fmt(prec=1)} (\VAR{coll.vatna.cs2|fmt(prec=1)} \cs{} vs \VAR{coll.vatna.ref|fmt(prec=1)} photogrammetry).
 The majority of the large, positive deviations occur where the \cs{} data
 were interpolated (Fig.~\ref{fig:disc:iceland_spatial_comparison}).
 Especially a large fraction of grid cells at glacier fronts that mostly
 show a strong positive bias, were interpolated.
-Averaged over interpolated grid cells, the mass balance difference is
+Averaged over interpolated grid cells, the difference in mass-balance rates is
 \VAR{vatna_df.mass.interp|MB(1)}, constituting
 \VAR{vatna_df.ratio.interp|P(0)} of the overall difference that could be
 due to a biased interpolation that we will continue to discuss below.
@@ -1759,7 +1425,7 @@ because they were flagged as not continuously glacierized. Further,
 and 5~\unit{\%} most positive differences.
 \begin{figure}[t]
     \includegraphics[width=8.3cm]{\VAR{"fig15__vatna_hugonnet_stat_comparison.pdf"|fig}}
-    \caption{Scatter plot of the surface elevation change
+    \caption{Two-dimensional histogram of the surface elevation change
         trends of the current \cs-based dataset and the earlier
         photogrammetry dataset
         \citep{hugonnet2021AcceleratedGlobalGlacier} per-cell for the
@@ -1846,7 +1512,9 @@ Earlier, we concluded that a part of the disagreement with reference
 data (\VAR{vatna_df.ratio.interp|P(0)} in the case of Vatnajökull) can
 be attributed to a biased interpolation. We interpolate voids using the
 state-of-the-art local mean hypsometric interpolation that has been
-found to perform best by \citet{mcnabb2019SensitivityGlacierVolume}. This
+found to perform best by \citet{mcnabb2019SensitivityGlacierVolume}.
+Our implementation adds weighting and ridge regularization
+(Sect.~\ref{sec:algo:voids}) to this approach. The underlying
 method bins elevation change data corresponding to bands of elevation in
 which the changes occur, fits a third-order polynomial to the changes,
 and integrates the fitted model folded with the hypsometry. Despite
@@ -1886,9 +1554,10 @@ signal is reflected above the swath scattering horizon.
 
 % \subsection{Surging glaciers}
 
-The product consistently shows the expected fingerprint of surging
+The product shows the expected fingerprint of surging
 glaciers in, e.g., Svalbard: gains at low elevations and losses at high
-elevations.
+elevations (Appendix~\ref{app:svalbard_surges},
+Fig.~\ref{fig:app:svalbard_surges}).
 Thus, CryoSwath is a promising tool to search for interesting study
 areas.
 The hypsometric change rate profiles could be used to automate finding
@@ -1934,11 +1603,13 @@ interpolating any voids to arrive at monthly sampled, three-month rolling-window
 customize the processing within each step.
 CryoSwath provides means for researchers without prior SARIn swath
 processing knowledge to derive elevation change estimates for glacier
-surfaces. Being open-source, CryoSwath offers maximal clarity on derived
-products. While CryoSwath offers pipelines to immediately compute
+surfaces. Being open-source, CryoSwath provides transparency and the
+ability to modify its implementation. While CryoSwath offers pipelines
+to immediately compute
 high-level products, the intermediate results can be inspected at any
-time. Unlike existing \cs-based data products, CryoSwath
-optionally outputs quality indicators. Its modularity allows adding
+time. CryoSwath
+optionally retains waveform diagnostics such as power and coherence
+in its point elevation outputs. Its modularity allows adding
 diagnostic output beyond the implemented options and, generally,
 replacing parts of the workflow according to custom demands.
 As MIT-licensed open-source software, CryoSwath can be adopted
@@ -1964,7 +1635,7 @@ Periphery, with \VAR{trends[("Arctic Canada North",
 "___")]|r2v("spec")|fmt(style="nounits", prec=2, absolute=True)} and
 \VAR{trends[("Greenland Periphery",
 "___")]|r2v("spec")|fmt(absolute=True)}, respectively.
-Iceland is a notable exception: the surface elevation of its ice caps
+Within Iceland, the surface elevation of its ice caps
 shows localized increases, particularly over Vatnajökull, the country's
 largest ice cap. These elevation gains occur mainly at higher altitudes,
 while lower elevations continue to show significant losses. However,
@@ -2001,11 +1672,11 @@ regional climatological shifts.
     elevation dataset is available under data DOI
     \href{https://doi.org/10.4121/955d7f5a-0e3f-4166-a411-f0dcc4557cb2}{\texttt{\small
     10.4121/955d7f5a-0e3f-4166-a411-f0dcc4557cb2}}
-    \citep{haacker2025GlacierSurfaceElevation}. The trend dataset is
+    \citep{haacker2025GlacierSurfaceElevationa}. The trend dataset is
     published under data DOI
     \href{https://doi.org/10.4121/85738a14-6652-4e0c-8552-d6fc729141b3}{\texttt{\small
     10.4121/85738a14-6652-4e0c-8552-d6fc729141b3}}
-    \citep{haacker2025GlacierSurfaceElevationa}. The code that allows
+    \citep{haacker2025GlacierSurfaceElevation}. The code that allows
     reproducing this manuscript including many of its figures and values
     can be accessed under code DOI
     \href{https://doi.org/10.4121/fdad7bbe-0deb-43d4-9a41-237be0d60df6}{\texttt{\small
@@ -2027,6 +1698,145 @@ regional climatological shifts.
 \appendix
 \section{Supplementary material}    %% Appendix A
 
+\subsection{Echo-coordinate derivation}
+\label{app:geolocation}
+
+The variables and reference frame are defined in
+Sect.~\ref{sec:algo:geolocation} and illustrated in Fig.~\ref{fig:sketch}.
+
+Below, we will calculate the echo origin location using the satellite
+position, its travel direction, the great-circle distance to the echo
+origin, and its elevation above the reference ellipsoid. The last two of
+the four are not yet known. With Eq.~\ref{eq:Pscat}, we start off by
+calculating the length of $\vec{P_\text{scat}}$. We then compute the
+angle $\Delta \zeta$ between $\vec{P_\text{CS2}}$ and
+$\vec{P_\text{scat}}$ in Eq.~\ref{eq:delZeta}.
+We continue in Eq.~\ref{eq:curvature} \citep[Ch.~4,
+Eq.~4.15]{torge2012Geodesy} by calculating the Earth's radius of
+curvature $r$ at nadir in the prime vertical plane. This is a good
+approximation because at the poles where the angle between \cs's
+across-track direction and the prime vertical plane is largest, the
+meridional radius of curvature approaches the radius of curvature in the
+prime vertical plane.
+Here, $a$ and $e$ refer to the WGS84 semi-major axis length and the
+eccentricity, respectively.
+Next, we calculate the elevation of the echo origin $h$ in
+Eq.~\ref{eq:elevation}.
+Lastly, in Eq.~\ref{eq:offNadirD}, we approximate the ellipsoidal
+distance between nadir and the echo origin by the great-circle distance
+$d_\text{off}$ with the curvature at nadir.
+
+\begin{gather}
+    \begin{split}
+        |\vec{P_\text{scat}}| & = \sqrt{(\vec{P_\text{CS2}}-(\vec{P_\text{CS2}}-\vec{P_\text{scat}}))^2} \\
+            & = \sqrt{|\vec{P_\text{CS2}}|^2
+          - 2\cdot \cos(\theta) \, |\vec{P_\text{CS2}}| \, \overline{P_\text{CS2}P_\text{scat}}
+            + \overline{P_\text{CS2}P_\text{scat}}^2} \label{eq:Pscat}
+    \end{split} \\
+    \Delta \zeta = \arctan\left(
+        \frac{|\vec{P_\text{scat}}| \, \sin(\theta)}{|\vec{P_\text{CS2}}| - |\vec{P_\text{scat}}| \, \cos(\theta)}
+        \right) \label{eq:delZeta} \\
+    r = \frac{a}{\sqrt{1-e^2\sin^2(\phi)}} \label{eq:curvature} \\
+    h = |\vec{P_\text{scat}}| - r \label{eq:elevation} \\
+    d_\text{off} = r \cdot \Delta \zeta \label{eq:offNadirD}
+\end{gather}
+
+Now, having \cs's coordinates $\phi$ and $\lambda$, the direction to the
+echo origin $\alpha + 90\unit{^\circ}$, and the great-circle distance
+$d_\text{off}$ between nadir and the echo origin, we use \texttt{pyproj}
+\citep{snow2025Pyproj4Pyproj371} to compute the echo-origin
+coordinates.
+
+\subsection{Svalbard surge examples}
+\label{app:svalbard_surges}
+
+Surface elevation trends for Svalbard are shown in
+Fig.~\ref{fig:app:svalbard_surges}.
+Multiple glaciers on Svalbard show thinning at higher elevations and
+thickening at the glacier fronts, indicating surge phases that, indeed,
+were reported earlier.
+Those are Wahlenbergbreen \citep{sevestre2018TidewaterGlacierSurges},
+Penckbreen and Sveitsarfonna
+\citep{mccerery2024TerrestrialGlacialGeomorphology},
+Morsjnevbreen/Strongbreen \citep{kaab2023GlobalClusteringRecent},
+and Recherchebreen \citep{kavan2024GlacierSurgeTrigger}.
+Arnesenbreen \citep{kaab2023GlobalClusteringRecent} shows the same
+signature, but less evident.
+On Austfonna, the most pronounced surge patterns are seen on
+Storisstraumen (also known as Basin-3) and the neighboring Basin-2
+\citep{dunse2015GlaciersurgeMechanismsPromoted,
+morris2022CryoSat2InterferometricMode}.
+
+\noappendix       %% use this to mark the end of the appendix section. Otherwise the figures might be numbered incorrectly (e.g. 10 instead of 1).
+
+% %% Regarding figures and tables in appendices, the following two options are possible depending on your general handling of figures and tables in the manuscript environment:
+
+% %% Option 1: If you sorted all figures and tables into the sections of the text, please also sort the appendix figures and appendix tables into the respective appendix sections.
+% %% They will be correctly named automatically.
+
+% %% Option 2: If you put all figures after the reference list, please insert appendix tables and figures after the normal tables and figures.
+% %% To rename them correctly to A1, A2, etc., please add the following commands in front of them:
+
+\appendixfigures  %% needs to be added in front of appendix figures
+
+\begin{sidewaysfigure}
+    \includegraphics{\VAR{"fig01__Algorithm_flowchart.pdf"|fig}}
+    \caption{%
+        Flowchart of the algorithm to compute monthly rasterized surface
+        elevation estimates and rasterized linear trends of the surface
+        elevation. The items refer to the main text and should be
+        understood in their context.
+    }
+    \label{fig:flowchart}
+\end{sidewaysfigure}
+\clearpage
+
+\begin{figure*}[t]
+    \includegraphics[width=12cm]{\VAR{"figA1__bias_by_interp_type.pdf"|fig}}
+    \caption{
+        Boxenplot \citep{hofmann2017LetterValuePlotsBoxplots} of
+        the bias by interpolation type and region with regard to
+        directly observed data. See Sect.~\ref{sec:errors:elevation} for
+        the calculation of the bias, which uses randomly chosen
+        ArcticDEM strips. Interpolation type 1: a model using trend,
+        annual, and semi-annual cycle components is fitted, 2: a
+        hypsometric model is fitted per basin, 3: a hypsometric model is
+        fitted across neighboring basins of the same termination
+        type, 4: linear temporal interpolation for gaps shorter than one
+        year, 5: hypsometric interpolation across second-order
+        subregions, and 6: temporal nearest-neighbor filling. Region
+        number 1: Alaska, 3: Arctic Canada North, 4: Arctic Canada
+        South, 5: Greenland Periphery, 6: Iceland, 7: Svalbard, 8:
+        Scandinavia, and 9: Russian Arctic.
+    }
+    \label{fig:app:bias_by_interp}
+\end{figure*}
+\clearpage
+
+\begin{figure*}[t]
+    \includegraphics[width=12cm]{\VAR{"figA2__one_year_error_correlation.pdf"|fig}}
+    \caption{
+        Boxen and swarm plots of temporal error correlations
+        for measurements separated by one year. The errors are measured
+        as deviation from ArcticDEM strip data. Region number 1: Alaska,
+        3: Arctic Canada North, 4: Arctic Canada South, 5: Greenland
+        Periphery, 6: Iceland, 7: Svalbard, and 9: Russian Arctic.
+        Scandinavia did not contribute applicable data to this analysis.
+    }
+    \label{fig:app:one_yr_corr}
+\end{figure*}
+\clearpage
+
+\begin{figure*}[t]
+    \includegraphics[width=12cm]{\VAR{"fig10__map_trend_svalbard.png"|fig}}
+    \caption{Surface elevation change rate of glaciers in Svalbard, 2010 --
+        2024. Selected surge examples are discussed
+        in Appendix~\ref{app:svalbard_surges}.}
+    \label{fig:app:svalbard_surges}
+\end{figure*}
+\clearpage
+
+\appendixtables   %% needs to be added in front of appendix tables
 
 % LTeX: enabled=false
 \begin{table}
@@ -2054,39 +1864,7 @@ regional climatological shifts.
     \end{tabularx}
 \end{table}
 % LTeX: enabled=true
-
-\begin{figure*}[t]
-    \includegraphics[width=12cm]{\VAR{"figA1__bias_by_interp_type.pdf"|fig}}
-    \caption{
-        Boxenplot \citep{hofmann2017LetterValuePlotsBoxplots} of
-        the bias by interpolation type and region with regard to
-        directly observed data. See Sect.~\ref{sec:errors:elevation} for
-        the calculation of the bias, which uses randomly chosen
-        ArcticDEM strips. Interpolation type 1: a model using trend,
-        annual, and semi-annual cycle components is fitted, 2: a
-        hypsometric model is fitted per basin, 3: a hypsometric model is
-        fitted across neighboring basins of the same termination
-        type, 4: linear temporal interpolation for gaps shorter than one
-        year, 5: hypsometric interpolation across second-order
-        subregions, and 6: temporal nearest-neighbor filling. Region
-        number 1: Alaska, 3: Arctic Canada North, 4: Arctic Canada
-        South, 5: Greenland Periphery, 6: Iceland, 7: Svalbard, 8:
-        Scandinavia, and 9: Russian Arctic.
-    }
-    \label{fig:app:bias_by_interp}
-\end{figure*}
-
-\begin{figure*}[t]
-    \includegraphics[width=12cm]{\VAR{"figA2__one_year_error_correlation.pdf"|fig}}
-    \caption{
-        Boxen and swarm plots of temporal error correlations
-        for measurements separated by one year. The errors are measured
-        as deviation from ArcticDEM strip data. Region number 1: Alaska,
-        3: Arctic Canada North, 4: Arctic Canada South, 5: Greenland
-        Periphery, 6: Iceland, 7: Svalbard, and 9: Russian Arctic.
-    }
-    \label{fig:app:one_yr_corr}
-\end{figure*}
+\clearpage
 
 % long-sideways
 \begin{table*}
@@ -2106,71 +1884,7 @@ regional climatological shifts.
 \label{tab:subreg_overview}
 \VAR{tabA2}
 \end{table*}
-
-
-\subsection{Vavilov Ice Cap extended analysis}
-\label{app:vavilov}
-
-Around the center of Vavilov Ice Cap, partly overlapping with the
-prominent unnamed surging basin, we observe rising surface elevations,
-prompting detailed analysis.
-
-We inspect actually observed, i.e., not interpolated, elevation
-estimates of those grid cells with a positive surface trend larger than
-1~\unit{m}~\unit{yr^{-1}} within a small extent around the feature.
-Specifically, we define the filter \verb|mask| as follows, using the
-surface trends \verb|trends.isel(band=0)|, the monthly dataset
-\verb|elevs| with actually observed cells
-\verb|elevs.elev_diff_interp_flag == 0|, and coordinates \verb|x| and
-\verb|y| of the ``EPSG:3413'' reference system.
-
-\begin{lstlisting}[language=python]
-mask = (
-    (trends.isel(band=0) > 1)  # select the feature by surface trend
-    & (elevs.elev_diff_interp_flag == 0)  # only use observed elevations
-    & (elevs.x >= 728_000)  # limit the considered extent to exclude
-    & (elevs.x <= 737_000)  #   grid cells that are not close to the
-    & (elevs.y >= 889_000)  #   feature
-    & (elevs.y <= 896_000)
-)
-\end{lstlisting}
-
-Figure~\ref{fig:app:vavilov} shows the contours of the selected grid
-cells on a map of surface trends in panel (a), and a monthly time series
-of the average surface elevation differences relative to ArcticDEM
-across the selected cells in panel (b). The time series shows
-fluctuations larger than 20~\unit{m} until 2016, and fluctuations that
-are mostly smaller than 20~\unit{m} afterward. Note that point elevation
-estimates that deviate from ArcticDEM by more than 150~\unit{m} are
-routinely discarded before rasterization, specifically limiting the very
-low time series values, here.
-
-\begin{figure*}[t]
-    \includegraphics[width=12cm]{\VAR{"figA3__vavilov_feature.pdf"|fig}}
-    \caption{
-        Surface elevation trends and contour around selected grid cells
-        (panel a), and average surface elevation differences relative
-        to ArcticDEM across the selected grid cells (panel b). In panel
-        (a), the patch of approximately uniform trends to the right of
-        the contour lines is associated with the interpolation algorithm
-        that uses an elevation-dependent third-order polynomial.
-    }
-    \label{fig:app:vavilov}
-\end{figure*}
-
-\noappendix       %% use this to mark the end of the appendix section. Otherwise the figures might be numbered incorrectly (e.g. 10 instead of 1).
-
-% %% Regarding figures and tables in appendices, the following two options are possible depending on your general handling of figures and tables in the manuscript environment:
-
-% %% Option 1: If you sorted all figures and tables into the sections of the text, please also sort the appendix figures and appendix tables into the respective appendix sections.
-% %% They will be correctly named automatically.
-
-% %% Option 2: If you put all figures after the reference list, please insert appendix tables and figures after the normal tables and figures.
-% %% To rename them correctly to A1, A2, etc., please add the following commands in front of them:
-
-% \appendixfigures  %% needs to be added in front of appendix figures
-
-% \appendixtables   %% needs to be added in front of appendix tables
+\clearpage
 
 % %% Please add \clearpage between each table and/or figure. Further guidelines on figures and tables can be found below.
 
@@ -2184,7 +1898,7 @@ low time series values, here.
     BW and JH wrote the manuscript.
 } %% this section is mandatory
 
-\competinginterests{We declare no competing interests.} %% this section is mandatory even if you declare that no competing interests are present
+\competinginterests{The authors declare that they have no conflict of interest.} %% this section is mandatory even if you declare that no competing interests are present
 
 % \disclaimer{TEXT} %% optional section
 
@@ -2199,9 +1913,15 @@ DEMs by the Polar Geospatial Center under NSF-OPP awards 1043681,
 outlines and ancillary data by the RGI 7.0 Consortium.
 \end{acknowledgements}
 
-
 \bibliographystyle{copernicus}
+{
+\def\doi#1{%
+  \href{https://doi.org/#1}{%
+    \begingroup\urlstyle{rm}\nolinkurl{https://doi.org/#1}\endgroup
+  }%
+}
 \bibliography{refs}
+}
 
 
 %% FIGURES

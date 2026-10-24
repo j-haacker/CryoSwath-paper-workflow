@@ -1,4 +1,4 @@
-\begin{thebibliography}{64}
+\begin{thebibliography}{55}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \providecommand{\urlprefix}{}
@@ -17,31 +17,31 @@ Berthier, E., Floricioiu, D., Gardner, A.~S., Gourmelen, N., Jakob, L., Paul,
   M.: Measuring glacier mass changes from space---a review, Reports on Progress
   in Physics, 86, 036\,801, \doi{10.1088/1361-6633/acaf8e}, 2023.
 
-\bibitem[{Bevan et~al.(2007)Bevan, Luckman, Murray, Sykes, and
-  Kohler}]{bevan2007PositiveMassBalance}
-Bevan, S., Luckman, A., Murray, T., Sykes, H., and Kohler, J.: Positive mass
-  balance during the late 20th century on {{Austfonna}}, {{Svalbard}}, revealed
-  using satellite radar interferometry, Annals of Glaciology, 46, 117--122,
-  \doi{10.3189/172756407782871477}, 2007.
-
 \bibitem[{Brockley(2021)}]{brockley2021CryoSatIceNetCDF}
-Brockley, D.: {{CryoSat Ice netCDF L2 Product Format Specification}}
-  [{{PFS-I-L2}}], Product {{Format Specification}} C2-RS-ACS-ESL-5265, Advanced
-  Computer Systems, 2021.
+Brockley, D.: CryoSat Ice netCDF L2 Product Format Specification [PFS-I-L2],
+  Product Format Specification C2-RS-ACS-ESL-5265, Advanced Computer Systems,
+  \urlprefix\url{https://earth.esa.int/eogateway/documents/20142/37627/CryoSat-netCDF-L2-Product-Format-Specification.pdf},
+  2021.
 
 \bibitem[{Cirac{\`i} et~al.(2020)Cirac{\`i}, Velicogna, and
   Swenson}]{ciraci2020ContinuityMassLoss}
-Cirac{\`i}, E., Velicogna, I., and Swenson, S.: Continuity of the {{Mass Loss}}
-  of the {{World}}'s {{Glaciers}} and {{Ice Caps From}} the {{GRACE}} and
-  {{GRACE Follow-On Missions}}, Geophysical Research Letters, 47,
-  e2019GL086\,926, \doi{10.1029/2019GL086926}, 2020.
+Cirac{\`i}, E., Velicogna, I., and Swenson, S.: Continuity of the Mass Loss of
+  the World's Glaciers and Ice Caps From the GRACE and GRACE Follow-On
+  Missions, Geophysical Research Letters, 47, e2019GL086\,926,
+  \doi{10.1029/2019GL086926}, 2020.
 
-\bibitem[{Dowdeswell and
-  Drewry(1989)}]{dowdeswell1989DynamicsAustfonnaNordaustlandet}
-Dowdeswell, J.~A. and Drewry, D.~J.: The {{Dynamics}} of {{Austfonna}},
-  {{Nordaustlandet}}, {{Svalbard}}: {{Surface Velocities}}, {{Mass Balance}},
-  and {{Subglacial Melt Water}}, Annals of Glaciology, 12, 37--45,
-  \doi{10.3189/S0260305500006935}, 1989.
+\bibitem[{{CryoTEMPO-EOLIS}(2026)}]{cryotempo-eolis2026CryoTEMPOEOLISProductHandbook}
+{CryoTEMPO-EOLIS}: CryoTEMPO-EOLIS product handbook, Tech. Rep.
+  CS\_CTS\_PHB\_EWAVE\_0401, European Space Agency,
+  \urlprefix\url{https://cryotempo-eolis.org/wp-content/uploads/sites/4/2022/08/CryoTempo-ThematicProduct-ProductHandbook_Latest.pdf},
+  2026.
+
+\bibitem[{Drinkwater et~al.(2004)Drinkwater, Francis, Ratier, and
+  Wingham}]{drinkwater2004EuropeanSpaceAgencys}
+Drinkwater, M.~R., Francis, R., Ratier, G., and Wingham, D.~J.: The European
+  Space Agency's Earth Explorer Mission CryoSat: measuring variability in the
+  cryosphere, Annals of Glaciology, 39, 313--320,
+  \doi{10.3189/172756404781814663}, 2004.
 
 \bibitem[{Dunse et~al.(2015)Dunse, Schellenberger, Hagen, K{\"a}{\"a}b,
   Schuler, and Reijmer}]{dunse2015GlaciersurgeMechanismsPromoted}
@@ -67,22 +67,44 @@ Eaton, B., Gregory, J., Drach, B., Taylor, K., Hankin, S., Caron, J., Signell,
   M., Blower, J., Horne, R., Whiteaker, T., Blodgett, D., Zender, C., Lee, D.,
   Hassell, D., Snow, A.~D., K{\"o}lling, T., Allured, D., Jelenak, A.,
   Soerensen, A.~M., Gaultier, L., Herl{\'e}dan, S., Manzano, F., B{\"a}rring,
-  L., Barker, C., and Bartholomew, S.~L.: {{NetCDF Climate}} and {{Forecast}}
-  ({{CF}}) {{Metadata Conventions}}, \doi{10.5281/ZENODO.14275599}, 2024.
+  L., Barker, C., and Bartholomew, S.~L.: NetCDF Climate and Forecast (CF)
+  Metadata Conventions, \doi{10.5281/ZENODO.14275599}, 2024.
 
 \bibitem[{{European Space
-  Agency}(2023)}]{europeanspaceagency2023L1bSARinPrecise}
-{European Space Agency}: L1b {{SARin Precise Orbit}},
-  \doi{10.5270/cr2-6afef01}, 2023.
+  Agency}(2019)}]{europeanspaceagency2019L1bSARinPrecise}
+{European Space Agency}: L1b SARin Precise Orbit, \doi{10.5270/cr2-6afef01},
+  2019.
+
+\bibitem[{{European Space
+  Agency}(2023)}]{europeanspaceagency2023NewCryoSatGeographical}
+{European Space Agency}: New CryoSat Geographical Mode Mask v5.0 now in
+  operation - Earth Online,
+  \urlprefix\url{https://earth.esa.int/eogateway/news/new-cryosat-geographical-mode-mask-v5-0-now-in-operation},
+  2023.
+
+\bibitem[{Foresta et~al.(2016)Foresta, Gourmelen, P{\'a}lsson, Nienow,
+  Bj{\"o}rnsson, and Shepherd}]{foresta2016SurfaceElevationChange}
+Foresta, L., Gourmelen, N., P{\'a}lsson, F., Nienow, P., Bj{\"o}rnsson, H., and
+  Shepherd, A.: Surface elevation change and mass balance of Icelandic ice caps
+  derived from swath mode CryoSat-2 altimetry, Geophysical Research Letters,
+  43, 12,138--12,145, \doi{10.1002/2016GL071485}, 2016.
+
+\bibitem[{Foresta et~al.(2018)Foresta, Gourmelen, Weissgerber, Nienow,
+  Williams, Shepherd, Drinkwater, and
+  Plummer}]{foresta2018HeterogeneousRapidIce}
+Foresta, L., Gourmelen, N., Weissgerber, F., Nienow, P., Williams, J.~J.,
+  Shepherd, A., Drinkwater, M.~R., and Plummer, S.: Heterogeneous and rapid ice
+  loss over the Patagonian Ice Fields revealed by CryoSat-2 swath radar
+  altimetry, Remote Sensing of Environment, 211, 441--455,
+  \doi{10.1016/j.rse.2018.03.041}, 2018.
 
 \bibitem[{{Garcia-Mond{\'e}jar} et~al.(2019){Garcia-Mond{\'e}jar}, Gourmelen,
   Escorihuela, Roca, Shepherd, and
   Plummer}]{garcia-mondejar2019MultisurfaceRetrackerSwath}
 {Garcia-Mond{\'e}jar}, A., Gourmelen, N., Escorihuela, M.~J., Roca, M.,
-  Shepherd, A., and Plummer, S.: Multisurface {{Retracker}} for {{Swath
-  Processing}} of {{Interferometric Radar Altimetry}}, IEEE Geoscience and
-  Remote Sensing Letters, 16, 1839--1843, \doi{10.1109/LGRS.2019.2913635},
-  2019.
+  Shepherd, A., and Plummer, S.: Multisurface Retracker for Swath Processing of
+  Interferometric Radar Altimetry, IEEE Geoscience and Remote Sensing Letters,
+  16, 1839--1843, \doi{10.1109/LGRS.2019.2913635}, 2019.
 
 \bibitem[{Gardner et~al.(2013)Gardner, Moholdt, Cogley, Wouters, Arendt, Wahr,
   Berthier, Hock, Pfeffer, Kaser, Ligtenberg, Bolch, Sharp, Hagen, {van den
@@ -90,14 +112,23 @@ Eaton, B., Gregory, J., Drach, B., Taylor, K., Hankin, S., Caron, J., Signell,
 Gardner, A.~S., Moholdt, G., Cogley, J.~G., Wouters, B., Arendt, A.~A., Wahr,
   J., Berthier, E., Hock, R., Pfeffer, W.~T., Kaser, G., Ligtenberg, S. R.~M.,
   Bolch, T., Sharp, M.~J., Hagen, J.~O., {van den Broeke}, M.~R., and Paul, F.:
-  A {{Reconciled Estimate}} of {{Glacier Contributions}} to {{Sea Level Rise}}:
-  2003 to 2009, Science, 340, 852--857, \doi{10.1126/science.1234532}, 2013.
+  A Reconciled Estimate of Glacier Contributions to Sea Level Rise: 2003 to
+  2009, Science, 340, 852--857, \doi{10.1126/science.1234532}, 2013.
+
+\bibitem[{Gourmelen et~al.(2018)Gourmelen, Escorihuela, Shepherd, Foresta,
+  Muir, {Garcia-Mond{\'e}jar}, Roca, Baker, and
+  Drinkwater}]{gourmelen2018CryoSat2SwathInterferometric}
+Gourmelen, N., Escorihuela, M.~J., Shepherd, A., Foresta, L., Muir, A.,
+  {Garcia-Mond{\'e}jar}, A., Roca, M., Baker, S.~G., and Drinkwater, M.~R.:
+  CryoSat-2 swath interferometric altimetry for mapping ice elevation and
+  elevation change, Advances in Space Research, 62, 1226--1242,
+  \doi{10.1016/j.asr.2017.11.014}, 2018.
 
 \bibitem[{Gray et~al.(2013)Gray, Burgess, Copland, Cullen, Galin, Hawley, and
   Helm}]{gray2013InterferometricSwathProcessing}
 Gray, L., Burgess, D., Copland, L., Cullen, R., Galin, N., Hawley, R., and
-  Helm, V.: Interferometric swath processing of {{Cryosat}} data for glacial
-  ice topography, The Cryosphere, 7, 1857--1867, \doi{10.5194/tc-7-1857-2013},
+  Helm, V.: Interferometric swath processing of Cryosat data for glacial ice
+  topography, The Cryosphere, 7, 1857--1867, \doi{10.5194/tc-7-1857-2013},
   2013.
 
 \bibitem[{Gray et~al.(2019)Gray, Burgess, Copland, Langley, Gogineni, Paden,
@@ -105,73 +136,54 @@ Gray, L., Burgess, D., Copland, L., Cullen, R., Galin, N., Hawley, R., and
   Smith}]{gray2019MeasuringHeightChange}
 Gray, L., Burgess, D., Copland, L., Langley, K., Gogineni, P., Paden, J.,
   Leuschen, C., {van As}, D., Fausto, R., Joughin, I., and Smith, B.: Measuring
-  {{Height Change Around}} the {{Periphery}} of the {{Greenland Ice Sheet With
-  Radar Altimetry}}, Frontiers in Earth Science, 7, 146,
+  Height Change Around the Periphery of the Greenland Ice Sheet With Radar
+  Altimetry, Frontiers in Earth Science, 7, 146,
   \doi{10.3389/feart.2019.00146}, 2019.
 
 \bibitem[{Haacker(2025{\natexlab{a}})}]{cryoswath}
-Haacker, J.: {{CryoSwath}}: {{CryoSat-2}} swath processing package, Zenodo,
+Haacker, J.: CryoSwath: CryoSat-2 swath processing package, Zenodo,
   \doi{10.5281/zenodo.14825358}, 2025{\natexlab{a}}.
 
 \bibitem[{Haacker(2025{\natexlab{b}})}]{haacker2025ListsGlacierComplex}
-Haacker, J.: Lists of glacier and complex {{IDs}} accompanying the article
-  "{{CryoSwath}}: a {{CryoSat-2}} swath processor and monthly surface elevation
-  dataset for {{Arctic}} mountain glaciers",
+Haacker, J.: Lists of glacier and complex IDs accompanying the article
+  "CryoSwath: a CryoSat-2 swath processor and monthly surface elevation dataset
+  for Arctic mountain glaciers",
   \doi{10.4121/FB61F7D2-6D70-4957-912F-E68FAC846B56}, 2025{\natexlab{b}}.
 
 \bibitem[{Haacker and
   Wouters(2025{\natexlab{a}})}]{haacker2025GlacierSurfaceElevation}
 Haacker, J. and Wouters, B.: Glacier surface elevation change rate dataset
-  accompanying the article "{{CryoSwath}}: a {{CryoSat-2}} swath processor and
-  monthly surface elevation dataset for {{Arctic}} mountain glaciers",
+  accompanying the article "CryoSwath: a CryoSat-2 swath processor and monthly
+  surface elevation dataset for Arctic mountain glaciers",
   \doi{10.4121/85738A14-6652-4E0C-8552-D6FC729141B3}, 2025{\natexlab{a}}.
 
 \bibitem[{Haacker and
   Wouters(2025{\natexlab{b}})}]{haacker2025GlacierSurfaceElevationa}
 Haacker, J. and Wouters, B.: Glacier surface elevation dataset accompanying the
-  article "{{CryoSwath}}: a {{CryoSat-2}} swath processor and monthly surface
-  elevation dataset for {{Arctic}} mountain glaciers",
+  article "CryoSwath: a CryoSat-2 swath processor and monthly surface elevation
+  dataset for Arctic mountain glaciers",
   \doi{10.4121/955D7F5A-0E3F-4166-A411-F0DCC4557CB2}, 2025{\natexlab{b}}.
 
 \bibitem[{Haacker and
   Wouters(2026{\natexlab{a}})}]{haacker2026AncilliaryDataReproduction}
 Haacker, J. and Wouters, B.: Ancilliary data for the reproduction workflow of
-  the article "{{CryoSwath}}: a {{CryoSat-2}} swath processor and monthly
-  surface elevation dataset for {{Arctic}} mountain glaciers",
+  the article "CryoSwath: a CryoSat-2 swath processor and monthly surface
+  elevation dataset for Arctic mountain glaciers",
   \doi{10.4121/48892E44-EC2A-434F-BAC1-8B7E1507E7D2}, 2026{\natexlab{a}}.
 
 \bibitem[{Haacker and
   Wouters(2026{\natexlab{b}})}]{haacker2026WorkflowReproductionArticle}
 Haacker, J. and Wouters, B.: Workflow for the reproduction of the article
-  "{{CryoSwath}}: a {{CryoSat-2}} swath processor and monthly surface elevation
-  dataset for {{Arctic}} mountain glaciers", 4TU.ResearchData,
+  "CryoSwath: a CryoSat-2 swath processor and monthly surface elevation dataset
+  for Arctic mountain glaciers", 4TU.ResearchData,
   \doi{10.4121/FDAD7BBE-0DEB-43D4-9A41-237BE0D60DF6}, 2026{\natexlab{b}}.
 
 \bibitem[{Haacker et~al.(2023)Haacker, Wouters, and
   Slobbe}]{haacker2023SystematicErrorsObserved}
 Haacker, J., Wouters, B., and Slobbe, C.: Systematic errors observed in
-  {{CryoSat-2}} elevation swaths on mountain glaciers and their implications,
-  IEEE Transactions on Geoscience and Remote Sensing, 61, 1--12,
+  CryoSat-2 elevation swaths on mountain glaciers and their implications, IEEE
+  Transactions on Geoscience and Remote Sensing, 61, 1--12,
   \doi{10.1109/TGRS.2023.3277277}, 2023.
-
-\bibitem[{Haacker et~al.(2024)Haacker, Wouters, Fettweis, Glissenaar, and
-  Box}]{haacker2024AtmosphericriverinducedFoehnEvents}
-Haacker, J., Wouters, B., Fettweis, X., Glissenaar, I.~A., and Box, J.~E.:
-  Atmospheric-river-induced foehn events drain glaciers on {{Novaya Zemlya}},
-  Nature Communications, 15, 7021, \doi{10.1038/s41467-024-51404-8}, 2024.
-
-\bibitem[{Harris et~al.(2020)Harris, Millman, {van der Walt}, Gommers,
-  Virtanen, Cournapeau, Wieser, Taylor, Berg, Smith, Kern, Picus, Hoyer, {van
-  Kerkwijk}, Brett, Haldane, Del~R{\'i}o, Wiebe, Peterson,
-  {G{\'e}rard-Marchant}, Sheppard, Reddy, Weckesser, Abbasi, Gohlke, and
-  Oliphant}]{harris2020ArrayProgrammingNumPy}
-Harris, C.~R., Millman, K.~J., {van der Walt}, S.~J., Gommers, R., Virtanen,
-  P., Cournapeau, D., Wieser, E., Taylor, J., Berg, S., Smith, N.~J., Kern, R.,
-  Picus, M., Hoyer, S., {van Kerkwijk}, M.~H., Brett, M., Haldane, A.,
-  Del~R{\'i}o, J.~F., Wiebe, M., Peterson, P., {G{\'e}rard-Marchant}, P.,
-  Sheppard, K., Reddy, T., Weckesser, W., Abbasi, H., Gohlke, C., and Oliphant,
-  T.~E.: Array programming with {{NumPy}}, Nature, 585, 357--362,
-  \doi{10.1038/s41586-020-2649-2}, 2020.
 
 \bibitem[{Hawley et~al.(2009)Hawley, Shepherd, Cullen, Helm, and
   Wingham}]{hawley2009IcesheetElevationsAcrosstrack}
@@ -182,9 +194,9 @@ Hawley, R.~L., Shepherd, A., Cullen, R., Helm, V., and Wingham, D.~J.:
 
 \bibitem[{Hofmann et~al.(2017)Hofmann, Wickham, and
   Kafadar}]{hofmann2017LetterValuePlotsBoxplots}
-Hofmann, H., Wickham, H., and Kafadar, K.: Letter-{{Value Plots}}: {{Boxplots}}
-  for {{Large Data}}, Journal of Computational and Graphical Statistics, 26,
-  469--477, \doi{10.1080/10618600.2017.1305277}, 2017.
+Hofmann, H., Wickham, H., and Kafadar, K.: Letter-Value Plots: Boxplots for
+  Large Data, Journal of Computational and Graphical Statistics, 26, 469--477,
+  \doi{10.1080/10618600.2017.1305277}, 2017.
 
 \bibitem[{H{\"o}hle and H{\"o}hle(2009)}]{hohle2009AccuracyAssessmentDigital}
 H{\"o}hle, J. and H{\"o}hle, M.: Accuracy assessment of digital elevation
@@ -212,14 +224,16 @@ Jakob, L. and Gourmelen, N.: Glacier mass loss between 2010 and 2020 dominated
 \bibitem[{Jakob et~al.(2021)Jakob, Gourmelen, Ewart, and
   Plummer}]{jakob2021SpatiallyTemporallyResolved}
 Jakob, L., Gourmelen, N., Ewart, M., and Plummer, S.: Spatially and temporally
-  resolved ice loss in {{High Mountain Asia}} and the {{Gulf}} of {{Alaska}}
-  observed by {{CryoSat-2}} swath altimetry between 2010 and 2019, The
-  Cryosphere, 15, 1845--1862, \doi{10.5194/tc-15-1845-2021}, 2021.
+  resolved ice loss in High Mountain Asia and the Gulf of Alaska observed by
+  CryoSat-2 swath altimetry between 2010 and 2019, The Cryosphere, 15,
+  1845--1862, \doi{10.5194/tc-15-1845-2021}, 2021.
 
 \bibitem[{Johnson and Dudgeon(1993)}]{johnson1993ArraySignalProcessing}
 Johnson, D.~H. and Dudgeon, D.~E.: Array signal processing: concepts and
-  techniques, Prentice-{{Hall}} signal processing series, P T R Prentice Hall,
-  Englewood Cliffs, NJ, ISBN 0-13-048513-6 978-0-13-048513-7, 1993.
+  techniques, Prentice-Hall signal processing series, P T R Prentice Hall,
+  Englewood Cliffs, NJ, ISBN 0-13-048513-6 978-0-13-048513-7,
+  \urlprefix\url{https://www.informit.com/store/array-signal-processing-concepts-and-techniques-9780130485137},
+  1993.
 
 \bibitem[{K{\"a}{\"a}b et~al.(2023)K{\"a}{\"a}b, Bazilova, Leclercq,
   Mannerfelt, and Strozzi}]{kaab2023GlobalClusteringRecent}
@@ -232,66 +246,34 @@ K{\"a}{\"a}b, A., Bazilova, V., Leclercq, P.~W., Mannerfelt, E.~S., and
   Zag{\'o}rski}]{kavan2024GlacierSurgeTrigger}
 Kavan, J., Strzelecki, M.~C., Benn, D.~I., Luckman, A., Roman, M., and
   Zag{\'o}rski, P.: Glacier surge as a trigger for the fastest delta growth in
-  the {{Arctic}}, Communications Earth \& Environment, 5,
+  the Arctic, Communications Earth \& Environment, 5,
   \doi{10.1038/s43247-024-01877-8}, 2024.
-
-\bibitem[{Larsen et~al.(2015)Larsen, Burgess, Arendt, O'Neel, Johnson, and
-  Kienholz}]{larsen2015SurfaceMeltDominates}
-Larsen, C.~F., Burgess, E., Arendt, A.~A., O'Neel, S., Johnson, A.~J., and
-  Kienholz, C.: Surface melt dominates {{Alaska}} glacier mass balance,
-  Geophysical Research Letters, 42, 5902--5908, \doi{10.1002/2015GL064349},
-  2015.
-
-\bibitem[{Li et~al.(2024)Li, Heidler, Mou, Ign{\'e}czi, Zhu, and
-  Bamber}]{li2024HighresolutionCalvingFront}
-Li, T., Heidler, K., Mou, L., Ign{\'e}czi, {\'A}., Zhu, X.~X., and Bamber,
-  J.~L.: A high-resolution calving front data product for marine-terminating
-  glaciers in {{Svalbard}}, Earth System Science Data, 16, 919--939,
-  \doi{10.5194/essd-16-919-2024}, 2024.
 
 \bibitem[{McCerery et~al.(2024)McCerery, Davies, Lovell, Pearce, {Calvo-Ryan},
   Ma{\l}ecki, and Woodward}]{mccerery2024TerrestrialGlacialGeomorphology}
 McCerery, R., Davies, B.~J., Lovell, H., Pearce, D.~A., {Calvo-Ryan}, R.,
   Ma{\l}ecki, J., and Woodward, J.: Terrestrial glacial geomorphology of
-  surge-type and non-surge-type glaciers on {{Svalbard}}, Journal of Maps, 20,
+  surge-type and non-surge-type glaciers on Svalbard, Journal of Maps, 20,
   2362\,277, \doi{10.1080/17445647.2024.2362277}, 2024.
 
 \bibitem[{McNabb et~al.(2019)McNabb, Nuth, K{\"a}{\"a}b, and
   Girod}]{mcnabb2019SensitivityGlacierVolume}
 McNabb, R., Nuth, C., K{\"a}{\"a}b, A., and Girod, L.: Sensitivity of glacier
-  volume change estimation to {{DEM}} void interpolation, The Cryosphere, 13,
+  volume change estimation to DEM void interpolation, The Cryosphere, 13,
   895--910, \doi{10.5194/tc-13-895-2019}, 2019.
-
-\bibitem[{M{\"o}ller et~al.(2022)M{\"o}ller, Friedl, Palmer, and
-  Marzeion}]{moller2022GroundingLineRetreat}
-M{\"o}ller, M., Friedl, P., Palmer, S.~J., and Marzeion, B.: Grounding {{Line
-  Retreat}} and {{Ice Discharge Variability}} at {{Two Surging}}, {{Ice
-  Shelf-Forming Basins}} of {{Flade Isblink Ice Cap}}, {{Northern Greenland}},
-  Journal of Geophysical Research: Earth Surface, 127, e2021JF006\,302,
-  \doi{10.1029/2021JF006302}, 2022.
 
 \bibitem[{Morris et~al.(2020)Morris, Moholdt, and
   Gray}]{morris2020SpreadSvalbardGlacier}
-Morris, A., Moholdt, G., and Gray, L.: Spread of {{Svalbard Glacier Mass Loss}}
-  to {{Barents Sea Margins Revealed}} by {{CryoSat-2}}, Journal of Geophysical
-  Research: Earth Surface, 125, e2019JF005\,357, \doi{10.1029/2019JF005357},
-  2020.
+Morris, A., Moholdt, G., and Gray, L.: Spread of Svalbard Glacier Mass Loss to
+  Barents Sea Margins Revealed by CryoSat-2, Journal of Geophysical Research:
+  Earth Surface, 125, e2019JF005\,357, \doi{10.1029/2019JF005357}, 2020.
 
 \bibitem[{Morris et~al.(2022)Morris, Moholdt, Gray, Schuler, and
   Eiken}]{morris2022CryoSat2InterferometricMode}
-Morris, A., Moholdt, G., Gray, L., Schuler, T.~V., and Eiken, T.: {{CryoSat-2}}
-  interferometric mode calibration and validation: {{A}} case study from the
-  {{Austfonna}} ice cap, {{Svalbard}}, Remote Sensing of Environment, 269,
-  112\,805, \doi{10.1016/j.rse.2021.112805}, 2022.
-
-\bibitem[{Newman et~al.(2016)Newman, Alexander, Ault, Cobb, Deser, Di~Lorenzo,
-  Mantua, Miller, Minobe, Nakamura, Schneider, Vimont, Phillips, Scott, and
-  Smith}]{newman2016PacificDecadalOscillation}
-Newman, M., Alexander, M.~A., Ault, T.~R., Cobb, K.~M., Deser, C., Di~Lorenzo,
-  E., Mantua, N.~J., Miller, A.~J., Minobe, S., Nakamura, H., Schneider, N.,
-  Vimont, D.~J., Phillips, A.~S., Scott, J.~D., and Smith, C.~A.: The {{Pacific
-  Decadal Oscillation}}, {{Revisited}}, Journal of Climate, 29, 4399--4427,
-  \doi{10.1175/JCLI-D-15-0508.1}, 2016.
+Morris, A., Moholdt, G., Gray, L., Schuler, T.~V., and Eiken, T.: CryoSat-2
+  interferometric mode calibration and validation: A case study from the
+  Austfonna ice cap, Svalbard, Remote Sensing of Environment, 269, 112\,805,
+  \doi{10.1016/j.rse.2021.112805}, 2022.
 
 \bibitem[{Otosaka et~al.(2020)Otosaka, Shepherd, Casal, Coccia, Davidson,
   Bella, Fettweis, Forsberg, Helm, Hogg, Hvidegaard, Lemos, Macedo, Munneke,
@@ -300,9 +282,9 @@ Newman, M., Alexander, M.~A., Ault, T.~R., Cobb, K.~M., Deser, C., Di~Lorenzo,
 Otosaka, I.~N., Shepherd, A., Casal, T. G.~D., Coccia, A., Davidson, M., Bella,
   A.~D., Fettweis, X., Forsberg, R., Helm, V., Hogg, A.~E., Hvidegaard, S.~M.,
   Lemos, A., Macedo, K., Munneke, P.~K., Parrinello, T., Simonsen, S.~B.,
-  Skourup, H., and S{\o}rensen, L.~S.: Surface {{Melting Drives Fluctuations}}
-  in {{Airborne Radar Penetration}} in {{West Central Greenland}}, Geophysical
-  Research Letters, 47, e2020GL088\,293, \doi{10.1029/2020GL088293}, 2020.
+  Skourup, H., and S{\o}rensen, L.~S.: Surface Melting Drives Fluctuations in
+  Airborne Radar Penetration in West Central Greenland, Geophysical Research
+  Letters, 47, e2020GL088\,293, \doi{10.1029/2020GL088293}, 2020.
 
 \bibitem[{Pedregosa et~al.(2011)Pedregosa, Varoquaux, Gramfort, Michel,
   Thirion, Grisel, Blondel, Prettenhofer, Weiss, Dubourg, Vanderplas, Passos,
@@ -311,8 +293,9 @@ Otosaka, I.~N., Shepherd, A., Casal, T. G.~D., Coccia, A., Davidson, M., Bella,
 Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel,
   O., Blondel, M., Prettenhofer, P., Weiss, R., Dubourg, V., Vanderplas, J.,
   Passos, A., Cournapeau, D., Brucher, M., Perrot, M., and Duchesnay, {\'E}.:
-  Scikit-learn: {{Machine Learning}} in {{Python}}, Journal of Machine Learning
-  Research, 12, 2825--2830, 2011.
+  Scikit-learn: Machine Learning in Python, Journal of Machine Learning
+  Research, 12, 2825--2830,
+  \urlprefix\url{http://jmlr.org/papers/v12/pedregosa11a.html}, 2011.
 
 \bibitem[{Pfeffer et~al.(2014)Pfeffer, Arendt, Bliss, Bolch, Cogley, Gardner,
   Hagen, Hock, Kaser, Kienholz, Miles, Moholdt, M{\"o}lg, Paul, Radi{\'c},
@@ -321,9 +304,9 @@ Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel,
 Pfeffer, W.~T., Arendt, A.~A., Bliss, A., Bolch, T., Cogley, J.~G., Gardner,
   A.~S., Hagen, J.-O., Hock, R., Kaser, G., Kienholz, C., Miles, E.~S.,
   Moholdt, G., M{\"o}lg, N., Paul, F., Radi{\'c}, V., Rastner, P., Raup, B.~H.,
-  Rich, J., Sharp, M.~J., and {The Randolph Consortium}: The {{Randolph Glacier
-  Inventory}}: a globally complete inventory of glaciers, Journal of
-  Glaciology, 60, 537--552, \doi{10.3189/2014JoG13J176}, 2014.
+  Rich, J., Sharp, M.~J., and {The Randolph Consortium}: The Randolph Glacier
+  Inventory: a globally complete inventory of glaciers, Journal of Glaciology,
+  60, 537--552, \doi{10.3189/2014JoG13J176}, 2014.
 
 \bibitem[{Porter et~al.(2023)Porter, Howat, Noh, Husby, Khuvis, Danish, Tomko,
   Gardiner, Negrete, Yadav, Klassen, Kelleher, Cloutier, Bakker, Enos, Arnold,
@@ -331,45 +314,43 @@ Pfeffer, W.~T., Arendt, A.~A., Bliss, A., Bolch, T., Cogley, J.~G., Gardner,
 Porter, C., Howat, I., Noh, M.-J., Husby, E., Khuvis, S., Danish, E., Tomko,
   K., Gardiner, J., Negrete, A., Yadav, B., Klassen, J., Kelleher, C.,
   Cloutier, M., Bakker, J., Enos, J., Arnold, G., Bauer, G., and Morin, P.:
-  {{ArcticDEM}} - {{Mosaics}}, {{Version}} 4.1, \doi{10.7910/DVN/3VDC4W}, 2023.
+  ArcticDEM - Mosaics, Version 4.1, \doi{10.7910/DVN/3VDC4W}, 2023.
 
 \bibitem[{Raney(1998)}]{raney1998DelayDopplerRadar}
-Raney, R.: The delay/{{Doppler}} radar altimeter, IEEE Transactions on
-  Geoscience and Remote Sensing, 36, 1578--1588, \doi{10.1109/36.718861}, 1998.
+Raney, R.: The delay/Doppler radar altimeter, IEEE Transactions on Geoscience
+  and Remote Sensing, 36, 1578--1588, \doi{10.1109/36.718861}, 1998.
 
 \bibitem[{{RGI 7.0 Consortium}(2023)}]{rgi7}
-{RGI 7.0 Consortium}: Randolph {{Glacier Inventory}} - {{A Dataset}} of
-  {{Global Glacier Outlines}}, \doi{10.5067/F6JMOVY5NAVZ}, 2023.
+{RGI 7.0 Consortium}: Randolph Glacier Inventory - A Dataset of Global Glacier
+  Outlines, \doi{10.5067/F6JMOVY5NAVZ}, 2023.
 
-\bibitem[{Rinne et~al.(2011)Rinne, Shepherd, Palmer, {van den Broeke}, Muir,
-  Ettema, and Wingham}]{rinne2011RecentElevationChanges}
-Rinne, E.~J., Shepherd, A., Palmer, S., {van den Broeke}, M.~R., Muir, A.,
-  Ettema, J., and Wingham, D.: On the recent elevation changes at the {{Flade
-  Isblink Ice Cap}}, northern {{Greenland}}, Journal of Geophysical Research,
-  116, F03\,024, \doi{10.1029/2011JF001972}, 2011.
+\bibitem[{Rounce et~al.(2023)Rounce, Hock, Maussion, Hugonnet, Kochtitzky,
+  Huss, Berthier, Brinkerhoff, Compagno, Copland, Farinotti, Menounos, and
+  McNabb}]{rounce2023GlobalGlacierChange}
+Rounce, D.~R., Hock, R., Maussion, F., Hugonnet, R., Kochtitzky, W., Huss, M.,
+  Berthier, E., Brinkerhoff, D., Compagno, L., Copland, L., Farinotti, D.,
+  Menounos, B., and McNabb, R.~W.: Global glacier change in the 21st century:
+  Every increase in temperature matters, Science, 379, 78--83,
+  \doi{10.1126/science.abo1324}, 2023.
 
 \bibitem[{Scagliola and Geminale(2020)}]{scagliola2020CryoSatIceNetCDF}
-Scagliola, M. and Geminale, T.: {{CryoSat Ice netCDF L1B Product Format
-  Specification}} [{{PFS-I-L1B}}], Product {{Format Specification}}
-  C2-RS-ACS-ESL-5364, Advanced Computer Systems, 2020.
-
-\bibitem[{Schaffer et~al.(2023)Schaffer, Copland, Zdanowicz, and
-  Hock}]{schaffer2023ModelingSurfaceMass}
-Schaffer, N., Copland, L., Zdanowicz, C., and Hock, R.: Modeling the surface
-  mass balance of {{Penny Ice Cap}}, {{Baffin Island}}, 1959--2099, Annals of
-  Glaciology, 64, 330--342, \doi{10.1017/aog.2023.68}, 2023.
+Scagliola, M. and Geminale, T.: CryoSat Ice netCDF L1B Product Format
+  Specification [PFS-I-L1B], Product Format Specification C2-RS-ACS-ESL-5364,
+  Advanced Computer Systems,
+  \urlprefix\url{https://earth.esa.int/eogateway/documents/20142/37627/CryoSat-netCDF-L1b-Product-Format-Specification.pdf},
+  2020.
 
 \bibitem[{{scikit-learn
-  developers}(2025)}]{scikit-learndevelopers2025Scikitlearn}
+  developers}(2026)}]{scikit-learndevelopers2026Scikitlearn}
 {scikit-learn developers}: scikit-learn, Zenodo, \doi{10.5281/ZENODO.591564},
-  2025.
+  2026.
 
 \bibitem[{Sevestre et~al.(2018)Sevestre, Benn, Luckman, Nuth, Kohler,
   Lindb{\"a}ck, and Pettersson}]{sevestre2018TidewaterGlacierSurges}
 Sevestre, H., Benn, D.~I., Luckman, A., Nuth, C., Kohler, J., Lindb{\"a}ck, K.,
-  and Pettersson, R.: Tidewater {{Glacier Surges Initiated}} at the
-  {{Terminus}}, Journal of Geophysical Research: Earth Surface, 123,
-  1035--1051, \doi{10.1029/2017JF004358}, 2018.
+  and Pettersson, R.: Tidewater Glacier Surges Initiated at the Terminus,
+  Journal of Geophysical Research: Earth Surface, 123, 1035--1051,
+  \doi{10.1029/2017JF004358}, 2018.
 
 \bibitem[{Snow et~al.(2025)Snow, Whitaker, Cochran, Miara, {van den Bossche},
   Mayo, Lucas, Cochrane, {de Kloe}, Karney, Shaw, Anh, Filipe, Ouzounoudis,
@@ -381,22 +362,15 @@ Snow, A.~D., Whitaker, J., Cochran, M., Miara, I., {van den Bossche}, J., Mayo,
   T.~Q., Filipe, Ouzounoudis, G., Dearing, J., Lostis, G., Couwenberg, B.,
   Hoese, D., {de Bittencourt}, H., Little, B., May, R., Itkin, M., McDonald,
   D., Schneck, C., Gohlke, C., Jurd, B., Raspaud, M., Brett, M., and Meulien,
-  M.: pyproj4/pyproj: 3.7.1 {{Release}}, Zenodo, \doi{10.5281/zenodo.14876934},
+  M.: pyproj4/pyproj: 3.7.1 Release, Zenodo, \doi{10.5281/zenodo.14876934},
   2025.
 
 \bibitem[{Str{\"o}{\ss}enreuther et~al.(2020)Str{\"o}{\ss}enreuther, Horwath,
   and Schr{\"o}der}]{strossenreuther2020HowDifferentAnalysis}
-Str{\"o}{\ss}enreuther, U., Horwath, M., and Schr{\"o}der, L.: How {{Different
-  Analysis}} and {{Interpolation Methods Affect}} the {{Accuracy}} of {{Ice
-  Surface Elevation Changes Inferred}} from {{Satellite Altimetry}},
-  Mathematical Geosciences, 52, 499--525, \doi{10.1007/s11004-019-09851-3},
-  2020.
-
-\bibitem[{Strozzi et~al.(2017)Strozzi, K{\"a}{\"a}b, and
-  Schellenberger}]{strozzi2017FrontalDestabilizationStonebreen}
-Strozzi, T., K{\"a}{\"a}b, A., and Schellenberger, T.: Frontal destabilization
-  of {{Stonebreen}}, {{Edge\o ya}}, {{Svalbard}}, The Cryosphere, 11, 553--566,
-  \doi{10.5194/tc-11-553-2017}, 2017.
+Str{\"o}{\ss}enreuther, U., Horwath, M., and Schr{\"o}der, L.: How Different
+  Analysis and Interpolation Methods Affect the Accuracy of Ice Surface
+  Elevation Changes Inferred from Satellite Altimetry, Mathematical
+  Geosciences, 52, 499--525, \doi{10.1007/s11004-019-09851-3}, 2020.
 
 \bibitem[{{The GlaMBIE Team} et~al.(2025){The GlaMBIE Team}, Zemp, Jakob,
   Dussaillant, Nussbaumer, Gourmelen, Dubber, A, Abdullahi, Andreassen,
@@ -425,93 +399,27 @@ Strozzi, T., K{\"a}{\"a}b, A., and Schellenberger, T.: Frontal destabilization
 Torge, W. and M{\"u}ller, J.: Geodesy, De Gruyter, Berlin, Boston, ISBN
   978-3-11-020718-7, \doi{10.1515/9783110250008}, 2012.
 
-\bibitem[{Virtanen et~al.(2020)Virtanen, Gommers, Oliphant, Haberland, Reddy,
-  Cournapeau, Burovski, Peterson, Weckesser, Bright, {van der Walt}, Brett,
-  Wilson, Millman, Mayorov, Nelson, Jones, Kern, Larson, Carey, Polat, Feng,
-  Moore, VanderPlas, Laxalde, Perktold, Cimrman, Henriksen, Quintero, Harris,
-  Archibald, Ribeiro, Pedregosa, {van Mulbregt}, {SciPy 1.0 Contributors},
-  Vijaykumar, Bardelli, Rothberg, Hilboll, Kloeckner, Scopatz, Lee, Rokem,
-  Woods, Fulton, Masson, H{\"a}ggstr{\"o}m, Fitzgerald, Nicholson, Hagen,
-  Pasechnik, Olivetti, Martin, Wieser, Silva, Lenders, Wilhelm, Young, Price,
-  Ingold, Allen, Lee, Audren, Probst, Dietrich, Silterra, Webber, Slavi{\v c},
-  Nothman, Buchner, Kulick, Sch{\"o}nberger, De~Miranda~Cardoso, Reimer,
-  Harrington, Rodr{\'i}guez, {Nunez-Iglesias}, Kuczynski, Tritz, Thoma,
-  Newville, K{\"u}mmerer, Bolingbroke, Tartre, Pak, Smith, Nowaczyk, Shebanov,
-  Pavlyk, Brodtkorb, Lee, McGibbon, Feldbauer, Lewis, Tygier, Sievert, Vigna,
-  Peterson, More, Pudlik, Oshima, Pingel, Robitaille, Spura, Jones, Cera,
-  Leslie, Zito, Krauss, Upadhyay, Halchenko, and
-  {V{\'a}zquez-Baeza}}]{virtanen2020SciPy10Fundamental}
-Virtanen, P., Gommers, R., Oliphant, T.~E., Haberland, M., Reddy, T.,
-  Cournapeau, D., Burovski, E., Peterson, P., Weckesser, W., Bright, J., {van
-  der Walt}, S.~J., Brett, M., Wilson, J., Millman, K.~J., Mayorov, N., Nelson,
-  A. R.~J., Jones, E., Kern, R., Larson, E., Carey, C.~J., Polat, {\.I}., Feng,
-  Y., Moore, E.~W., VanderPlas, J., Laxalde, D., Perktold, J., Cimrman, R.,
-  Henriksen, I., Quintero, E.~A., Harris, C.~R., Archibald, A.~M., Ribeiro,
-  A.~H., Pedregosa, F., {van Mulbregt}, P., {SciPy 1.0 Contributors},
-  Vijaykumar, A., Bardelli, A.~P., Rothberg, A., Hilboll, A., Kloeckner, A.,
-  Scopatz, A., Lee, A., Rokem, A., Woods, C.~N., Fulton, C., Masson, C.,
-  H{\"a}ggstr{\"o}m, C., Fitzgerald, C., Nicholson, D.~A., Hagen, D.~R.,
-  Pasechnik, D.~V., Olivetti, E., Martin, E., Wieser, E., Silva, F., Lenders,
-  F., Wilhelm, F., Young, G., Price, G.~A., Ingold, G.-L., Allen, G.~E., Lee,
-  G.~R., Audren, H., Probst, I., Dietrich, J.~P., Silterra, J., Webber, J.~T.,
-  Slavi{\v c}, J., Nothman, J., Buchner, J., Kulick, J., Sch{\"o}nberger,
-  J.~L., De~Miranda~Cardoso, J.~V., Reimer, J., Harrington, J., Rodr{\'i}guez,
-  J. L.~C., {Nunez-Iglesias}, J., Kuczynski, J., Tritz, K., Thoma, M.,
-  Newville, M., K{\"u}mmerer, M., Bolingbroke, M., Tartre, M., Pak, M., Smith,
-  N.~J., Nowaczyk, N., Shebanov, N., Pavlyk, O., Brodtkorb, P.~A., Lee, P.,
-  McGibbon, R.~T., Feldbauer, R., Lewis, S., Tygier, S., Sievert, S., Vigna,
-  S., Peterson, S., More, S., Pudlik, T., Oshima, T., Pingel, T.~J.,
-  Robitaille, T.~P., Spura, T., Jones, T.~R., Cera, T., Leslie, T., Zito, T.,
-  Krauss, T., Upadhyay, U., Halchenko, Y.~O., and {V{\'a}zquez-Baeza}, Y.:
-  {{SciPy}} 1.0: fundamental algorithms for scientific computing in {{Python}},
-  Nature Methods, 17, 261--272, \doi{10.1038/s41592-019-0686-2}, 2020.
-
-\bibitem[{Ward and Baird(1954)}]{ward1954PartDescriptionPenny}
-Ward, W.~H. and Baird, P.~D.: Part {{I}}: {{A Description}} of the {{Penny Ice
-  Cap}}, its {{Accumulation}} and {{Ablation}}, Journal of Glaciology, 2,
-  342--355, \doi{10.3189/S0022143000025223}, 1954.
-
-\bibitem[{Wendler et~al.(2017)Wendler, Gordon, and
-  Stuefer}]{wendler2017PrecipitationPrecipitationChange}
-Wendler, G., Gordon, T., and Stuefer, M.: On the {{Precipitation}} and
-  {{Precipitation Change}} in {{Alaska}}, Atmosphere, 8, 253,
-  \doi{10.3390/atmos8120253}, 2017.
-
-\bibitem[{Willis et~al.(2018)Willis, Zheng, Durkin, Pritchard, Ramage,
-  Dowdeswell, Benham, Bassford, Stearns, Glazovsky, Macheret, and
-  Porter}]{willis2018MassiveDestabilizationArctic}
-Willis, M.~J., Zheng, W., Durkin, W.~J., Pritchard, M.~E., Ramage, J.~M.,
-  Dowdeswell, J.~A., Benham, T.~J., Bassford, R.~P., Stearns, L.~A., Glazovsky,
-  A.~F., Macheret, Y.~Y., and Porter, C.~C.: Massive destabilization of an
-  {{Arctic}} ice cap, Earth and Planetary Science Letters, 502, 146--155,
-  \doi{10.1016/j.epsl.2018.08.049}, 2018.
+\bibitem[{Wingham et~al.(2006)Wingham, Francis, Baker, Bouzinac, Brockley,
+  Cullen, {de Chateau-Thierry}, Laxon, Mallow, Mavrocordatos, Phalippou,
+  Ratier, Rey, Rostan, Viau, and Wallis}]{wingham2006CryoSatMissionDetermine}
+Wingham, D.~J., Francis, C.~R., Baker, S., Bouzinac, C., Brockley, D., Cullen,
+  R., {de Chateau-Thierry}, P., Laxon, S.~W., Mallow, U., Mavrocordatos, C.,
+  Phalippou, L., Ratier, G., Rey, L., Rostan, F., Viau, P., and Wallis, D.~W.:
+  CryoSat: A mission to determine the fluctuations in Earth's land and marine
+  ice fields, Advances in Space Research, 37, 841--871,
+  \doi{10.1016/j.asr.2005.07.027}, 2006.
 
 \bibitem[{Wolken et~al.(2020)Wolken, Wouters, Sharp, Andreassen, Baker,
   Burgess, Kohler, Luks, and O'Neel}]{wolken2020GlaciersIceCaps}
 Wolken, G.~J., Wouters, B., Sharp, M., Andreassen, L.~M., Baker, E.~H.,
   Burgess, D., Kohler, J., Luks, B., and O'Neel, S.: Glaciers and ice caps
-  outside {{Greenland}}, in: State of the {{Climate}} in 2019, pp. S260--S265,
-  Bulletin of the American Meteorological Society,
-  \doi{10.1175/BAMS-D-20-0086.1}, 2020.
+  outside Greenland, in: State of the Climate in 2019, pp. S260--S265, Bulletin
+  of the American Meteorological Society, \doi{10.1175/BAMS-D-20-0086.1}, 2020.
 
 \bibitem[{Wouters et~al.(2019)Wouters, Gardner, and
   Moholdt}]{wouters2019GlobalGlacierMass}
 Wouters, B., Gardner, A.~S., and Moholdt, G.: Global glacier mass loss during
-  the {{GRACE}} satellite mission (2002-2016), Frontiers in Earth Science, 7,
+  the GRACE satellite mission (2002-2016), Frontiers in Earth Science, 7,
   \doi{10.3389/feart.2019.00096}, 2019.
-
-\bibitem[{Wytiahlowsky et~al.(2023)Wytiahlowsky, Stokes, and
-  Evans}]{wytiahlowsky2023RemoteSensingGlacier}
-Wytiahlowsky, H., Stokes, C.~R., and Evans, D. J.~A.: Remote sensing of glacier
-  change (1965--2021) and identification of surge-type glaciers on {{Severnaya
-  Zemlya}}, {{Russian High Arctic}}, Journal of Glaciology, pp. 1--21,
-  \doi{10.1017/jog.2023.60}, 2023.
-
-\bibitem[{Zheng et~al.(2019)Zheng, Pritchard, Willis, and
-  Stearns}]{zheng2019PossibleTransitionGlacial}
-Zheng, W., Pritchard, M.~E., Willis, M.~J., and Stearns, L.~A.: The {{Possible
-  Transition From Glacial Surge}} to {{Ice Stream}} on {{Vavilov Ice Cap}},
-  Geophysical Research Letters, 46, 13\,892--13\,902,
-  \doi{10.1029/2019GL084948}, 2019.
 
 \end{thebibliography}
