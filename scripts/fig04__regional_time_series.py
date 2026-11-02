@@ -122,7 +122,7 @@ def main():
         snakemake_fallback(
             "output",
             0,
-            str(project_path("figures", "fig05__regional_time_series.pdf")),
+            str(project_path("figures", "fig04__regional_time_series.pdf")),
         )
     )
 

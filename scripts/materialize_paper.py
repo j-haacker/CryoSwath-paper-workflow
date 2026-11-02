@@ -160,30 +160,6 @@ def main():
         open(
             snakemake_fallback(
                 "input",
-                "barnes",
-                str(project_path("results", "closeup__icecap__barnes.yaml")),
-            ),
-            "r",
-        ) as in_barnes,
-        open(
-            snakemake_fallback(
-                "input",
-                "penny",
-                str(project_path("results", "closeup__icecap__penny.yaml")),
-            ),
-            "r",
-        ) as in_penny,
-        open(
-            snakemake_fallback(
-                "input",
-                "sukkerqara",
-                str(project_path("results", "closeup__icecap__sukkerqara.yaml")),
-            ),
-            "r",
-        ) as in_sukkerqara,
-        open(
-            snakemake_fallback(
-                "input",
                 "scandinavian",
                 str(project_path("results", "closeup__icecap__scandinavian.yaml")),
             ),
@@ -192,11 +168,11 @@ def main():
         open(
             snakemake_fallback(
                 "input",
-                "fig16_clip",
+                "vatna_summary",
                 str(project_path("results", "vatna_deviation_analysis.yaml")),
             ),
             "r",
-        ) as in_fig16_clip,
+        ) as in_vatna_summary,
         open(
             snakemake_fallback(
                 "input",
@@ -239,10 +215,7 @@ def main():
                     + next(f"{x:.{precision(x)}f}" for x in 100 * omitted_df.area_o1share.values[[-1]]) # pyright: ignore[reportOperatorIssue]
                 ),
                 "corr_1yr": {"value": float(in_1yr_corr.read())},
-                "barnes": yaml.safe_load(in_barnes),
-                "penny": yaml.safe_load(in_penny),
-                "sukkerqara": yaml.safe_load(in_sukkerqara),
-                "vatna": yaml.safe_load(in_fig16_clip),
+                "vatna": yaml.safe_load(in_vatna_summary),
             }
         )
         scandi_tex = (
@@ -272,17 +245,6 @@ def main():
                         "input",
                         "trend_tbl",
                         str(project_path("results", "result__regional_trends.csv")),
-                    ),
-                    index_col=0,
-                    header=[0, 1],
-                )
-                .stack(level=0)
-                .to_dict(orient="index"),  # pyright: ignore[reportCallIssue]
-                grnl=pd.read_csv(
-                    snakemake_fallback(
-                        "input",
-                        "grnl_tbl",
-                        str(project_path("results", "result__greenland_trends.csv")),
                     ),
                     index_col=0,
                     header=[0, 1],

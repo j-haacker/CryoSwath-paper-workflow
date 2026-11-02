@@ -107,23 +107,21 @@ rule o2reg_filename_token_list:
         make_o2reg_filename_token_list(output[0])
 
 
-if PUBLICATION_ARTIFACT_SOURCE != "downloaded":
-
-    rule download_external_figures:
-        output:
-            MANUSCRIPT_EXTERNAL_FIGURES,
-        params:
-            archive=pathvar_path("<resources>/downloads/downloaded_publication_data.zip"),
-            url=PUBLICATION_DATA_URL,
-        log:
-            "<logs>/download_external_figures.log",
-        run:
-            download_archive_members(
-                url=params.url,
-                archive_path=params.archive,
-                destinations=list(output),
-                log_path=log[0],
-            )
+rule download_external_figures:
+    output:
+        MANUSCRIPT_EXTERNAL_FIGURES,
+    params:
+        archive=pathvar_path("<resources>/downloads/external_figures.zip"),
+        url=PUBLICATION_DATA_URL,
+    log:
+        "<logs>/download_external_figures.log",
+    run:
+        download_archive_members(
+            url=params.url,
+            archive_path=params.archive,
+            destinations=list(output),
+            log_path=log[0],
+        )
 
 
 rule download_monthly_dataset:
@@ -172,29 +170,29 @@ rule download_trends_dataset:
 
 if PUBLICATION_ARTIFACT_SOURCE == "produced":
 
-    rule fig02__coherence_waveform_examples:
+    rule fig01__coherence_waveform_examples:
         input:
             CRYOSWATH_AUX_FILES,
         output:
-            "paper/figures/fig02__example__wf_start.pdf",
+            "paper/figures/fig01__example__wf_start.pdf",
         log:
-            "<logs>/fig02__coherence_waveform_examples.log",
+            "<logs>/fig01__coherence_waveform_examples.log",
         script:
-            script_path("fig02__coherence_waveform_examples.py")
+            script_path("fig01__coherence_waveform_examples.py")
 
 
-rule fig03__combined_sketch:
+rule fig02__combined_sketch:
     input:
-        along="paper/figures/fig03a__sketch__along-track-plane.png",
-        across="paper/figures/fig03b__sketch__across-track-plane.png",
+        along="paper/figures/fig02a__sketch__along-track-plane.png",
+        across="paper/figures/fig02b__sketch__across-track-plane.png",
     output:
-        "paper/figures/fig03__geometry_sketch.png",
+        "paper/figures/fig02__geometry_sketch.png",
     params:
         fs=120,
         pos="+40+40",
         pad=500,
     log:
-        "<logs>/fig03__combined_sketch.log",
+        "<logs>/fig02__combined_sketch.log",
     shell:
         r"""
         FONT=$(fc-match -f '%{{file}}\n' 'DejaVu Sans:style=Bold')
@@ -261,25 +259,6 @@ if GLACIERIZED_AREA_SOURCE == "produced":
             "<logs>/glacierized_areas.log",
         script:
             script_path("measure_glacierized_areas.py")
-
-
-if PUBLICATION_ARTIFACT_SOURCE == "produced":
-
-    rule figA3__vavilov_feature:
-        input:
-            trend=local_trend_path("Russian_Arctic__Severnaya_Zemlya"),
-            outline=ancient(
-                "<resources>/auxiliary/RGI/RGI2000-v7.0-C-09_russian_arctic/RGI2000-v7.0-C-09_russian_arctic.shp"
-            ),
-            monthly_ds=ancient(
-                "<resources>/monthly_dataset/Glacier_surface_elevation__Russian_Arctic__Severnaya_Zemlya__monthly_500x500m.nc"
-            ),
-        output:
-            "paper/figures/figA3__vavilov_feature.pdf",
-        log:
-            "<logs>/figA3__vavilov_feature.log",
-        script:
-            script_path("figA3__vavilov_feature.py")
 
 
 if CALVAL_SOURCE == "produced":
@@ -398,7 +377,7 @@ rule calval__estimate_interpolation_uncertainty:
     output:
         unc_tbl="<results>/uncertainty_by_interp__uncertainty.csv",
         corr_tbl="<results>/uncertainty_by_interp__correlations.csv",
-        interp_bias_fig="paper/figures/figA1__bias_by_interp_type.pdf",
+        interp_bias_fig="paper/figures/figA2__bias_by_interp_type.pdf",
     log:
         notebook="<logs>/calval/estimate_interpolation_uncertainty.ipynb",
     benchmark:
@@ -412,7 +391,7 @@ rule calval__estimate_temporal_error_correlation:
         CURRENT_SOURCE_CALVAL_TEMPORAL,
     output:
         "<results>/one_year_error_correlation.txt",
-        boxen_plt="paper/figures/figA2__one_year_error_correlation.pdf",
+        boxen_plt="paper/figures/figA3__one_year_error_correlation.pdf",
     log:
         notebook="<logs>/calval/estimate_temporal_error_correlation.ipynb",
     benchmark:
@@ -426,8 +405,8 @@ rule calval_all:
         "<results>/uncertainty_by_interp__uncertainty.csv",
         "<results>/uncertainty_by_interp__correlations.csv",
         "<results>/one_year_error_correlation.txt",
-        "paper/figures/figA1__bias_by_interp_type.pdf",
-        "paper/figures/figA2__one_year_error_correlation.pdf",
+        "paper/figures/figA2__bias_by_interp_type.pdf",
+        "paper/figures/figA3__one_year_error_correlation.pdf",
 
 
 if ELEVATION_TIMESERIES_SOURCE == "produced":
@@ -467,7 +446,6 @@ if PUBLICATION_ARTIFACT_SOURCE == "produced":
             subregion_trend_table="<results>/tab01__subregion_trend_table.tex",
             value_collection="<results>/result__value_collection.yaml",
             trend_tbl="<results>/result__regional_trends.csv",
-            grnl_tbl="<results>/result__greenland_trends.csv",
             period_p_values="<results>/result__period_comparison_p_values.csv",
         log:
             notebook="<logs>/result__value_collection.ipynb",
@@ -477,56 +455,37 @@ if PUBLICATION_ARTIFACT_SOURCE == "produced":
             notebook_path("result__value_collection.py.ipynb")
 
 
-rule fig04__arcticwide_timeseries:
+rule fig03__arcticwide_timeseries:
     input:
         area_tbl=CURRENT_SOURCE_AREA_TABLE,
         avg_elev_tbl=CURRENT_SOURCE_AVG_TABLE,
     output:
-        "paper/figures/fig04__arctic-wide_time_series.pdf",
+        "paper/figures/fig03__arctic-wide_time_series.pdf",
     log:
-        "<logs>/fig04__arcticwide_timeseries.log",
+        "<logs>/fig03__arcticwide_timeseries.log",
     script:
-        script_path("fig04__arctic-wide_time_series.py")
+        script_path("fig03__arctic-wide_time_series.py")
 
 
-rule fig05__regional_time_series:
+rule fig04__regional_time_series:
     input:
         area_tbl=CURRENT_SOURCE_AREA_TABLE,
         avg_elev_tbl=CURRENT_SOURCE_AVG_TABLE,
         rgi_o1=ancient(RGI_O1_REGIONS),
     output:
-        "paper/figures/fig05__regional_time_series.pdf",
+        "paper/figures/fig04__regional_time_series.pdf",
     log:
-        "<logs>/fig05__regional_time_series.log",
+        "<logs>/fig04__regional_time_series.log",
     script:
-        script_path("fig05__regional_time_series.py")
+        script_path("fig04__regional_time_series.py")
 
 
 ICECAP_REGIONS = {
-    "barnes": (
-        4,
-        [
-            "West Baffin Island",
-            "East Central Baffin Island",
-        ],
-    ),
-    "penny": (
-        4,
-        [
-            "South East Baffin Island",
-            "Cumberland Sound",
-        ],
-    ),
-    "sukkerqara": (5, ["South West Greenland"]),
+    "Iceland": (6, ["Iceland"]),
     "scandinavian": (
         8,
-        [
-            "North Scandinavia",
-            "Southwest Scandinavia",
-            "Southeast Scandinavia",
-        ],
+        ["North Scandinavia", "Southwest Scandinavia", "Southeast Scandinavia"],
     ),
-    "Iceland": (6, ["Iceland"]),
 }
 
 
@@ -561,6 +520,8 @@ if PUBLICATION_ARTIFACT_SOURCE == "produced":
             corr_tbl="<results>/uncertainty_by_interp__correlations.csv",
         output:
             "<results>/closeup__icecap__{token}.yaml",
+        wildcard_constraints:
+            token="scandinavian",
         threads: 4
         log:
             notebook="<logs>/closeup__icecap__{token}.ipynb",
@@ -643,10 +604,10 @@ if PUBLICATION_ARTIFACT_SOURCE == "produced":
             ref="<resources>/reference_trends/ref_trends_Vatnajökull.tif",
             own="<resources>/trends_dataset/Glacier_surface_elevation_trend_2010-2019__Iceland__Iceland__Vatnajökull__500x500m.tif",
         output:
-            diff_raster="<results>/fig14c_source__trend_diff_to_ref.tif",
+            diff_raster="<results>/fig06c_source__trend_diff_to_ref.tif",
             vals="<results>/vatna_deviation_analysis.yaml",
             expl_tbl="<results>/vatna_deviation_analysis.csv",
-            fig15="paper/figures/fig15__vatna_hugonnet_stat_comparison.pdf",
+            fig07="paper/figures/fig07__vatna_hugonnet_stat_comparison.pdf",
         log:
             notebook="<logs>/iceland_hugonnet_comparison.ipynb",
         benchmark:
@@ -696,16 +657,16 @@ if COVERAGE_ANALYSIS_SOURCE == "produced":
             script_path("coverage_analysis.py")
 
 
-rule fig16__coverage_terraincomplexity_correlation:
+rule fig08__coverage_terraincomplexity_correlation:
     input:
         CURRENT_SOURCE_COVERAGE_ANALYSIS,
     output:
-        fig="paper/figures/fig16__coverage_terraincomplexity_correlation.pdf",
+        fig="paper/figures/fig08__coverage_terraincomplexity_correlation.pdf",
         fit="<results>/coverage_terraincomplexity_correlation.yaml",
     log:
-        "<logs>/fig16__coverage_terraincomplexity_correlation.log",
+        "<logs>/fig08__coverage_terraincomplexity_correlation.log",
     script:
-        script_path("fig16__coverage_terraincomplexity_correlation.py")
+        script_path("fig08__coverage_terraincomplexity_correlation.py")
 
 
 if PUBLICATION_ARTIFACT_SOURCE == "produced":
@@ -740,16 +701,12 @@ rule materialize_manuscript_tex:
         o1_trend_tbl="<results>/tab01__subregion_trend_table.tex",
         refJG_tbl="<results>/tab03__JG_comparison.tex",
         one_yr_corr="<results>/one_year_error_correlation.txt",
-        barnes="<results>/closeup__icecap__barnes.yaml",
-        penny="<results>/closeup__icecap__penny.yaml",
-        sukkerqara="<results>/closeup__icecap__sukkerqara.yaml",
         scandinavian="<results>/closeup__icecap__scandinavian.yaml",
-        fig16_clip="<results>/vatna_deviation_analysis.yaml",
+        vatna_summary="<results>/vatna_deviation_analysis.yaml",
         cover_fit="<results>/coverage_terraincomplexity_correlation.yaml",
         subreg_tbl="<results>/tabA2__subregion_overview.tex",
         omitted="<results>/omitted_subregions.csv",
         trend_tbl="<results>/result__regional_trends.csv",
-        grnl_tbl="<results>/result__greenland_trends.csv",
         isl_disc="<results>/vatna_deviation_analysis.csv",
         cov_disc="<results>/coverage_analysis.csv",
         period_p_values="<results>/result__period_comparison_p_values.csv",

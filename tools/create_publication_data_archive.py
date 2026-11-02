@@ -9,11 +9,12 @@ import hashlib
 import json
 from pathlib import Path
 import sys
+import tempfile
 import zipfile
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_OUTPUT = PROJECT_ROOT / "resources" / "downloads" / "publication_data.zip"
+DEFAULT_OUTPUT = PROJECT_ROOT / "resources" / "downloads" / "publication_data_candidate.zip"
 
 
 RGI_TOKENS = [
@@ -28,14 +29,14 @@ RGI_TOKENS = [
 ]
 
 GENERATED_MANUSCRIPT_FIGURES = [
-    "paper/figures/fig02__example__wf_start.pdf",
-    "paper/figures/fig04__arctic-wide_time_series.pdf",
-    "paper/figures/fig05__regional_time_series.pdf",
-    "paper/figures/fig15__vatna_hugonnet_stat_comparison.pdf",
-    "paper/figures/fig16__coverage_terraincomplexity_correlation.pdf",
-    "paper/figures/figA1__bias_by_interp_type.pdf",
-    "paper/figures/figA2__one_year_error_correlation.pdf",
-    "paper/figures/figA3__vavilov_feature.pdf",
+    "paper/figures/fig01__example__wf_start.pdf",
+    "paper/figures/fig02__geometry_sketch.png",
+    "paper/figures/fig03__arctic-wide_time_series.pdf",
+    "paper/figures/fig04__regional_time_series.pdf",
+    "paper/figures/fig07__vatna_hugonnet_stat_comparison.pdf",
+    "paper/figures/fig08__coverage_terraincomplexity_correlation.pdf",
+    "paper/figures/figA2__bias_by_interp_type.pdf",
+    "paper/figures/figA3__one_year_error_correlation.pdf",
 ]
 
 EXTERNAL_MANUSCRIPT_FIGURES = [
@@ -64,7 +65,7 @@ def publication_members() -> list[dict[str, str]]:
         file_spec(
             "results/coverage_analysis.csv",
             "downloaded_analysis_input",
-            "Terrain-complexity coverage analysis input for figure 16.",
+            "Terrain-complexity coverage analysis input for figure 8.",
         ),
     ]
 
@@ -90,21 +91,6 @@ def publication_members() -> list[dict[str, str]]:
     specs.extend(
         [
             file_spec(
-                "results/closeup__icecap__barnes.yaml",
-                "manuscript_input",
-                "Derived Barnes Ice Cap closeup values for manuscript text.",
-            ),
-            file_spec(
-                "results/closeup__icecap__penny.yaml",
-                "manuscript_input",
-                "Derived Penny Ice Cap closeup values for manuscript text.",
-            ),
-            file_spec(
-                "results/closeup__icecap__sukkerqara.yaml",
-                "manuscript_input",
-                "Derived Sukkertoppen/Southwest Greenland closeup values for manuscript text.",
-            ),
-            file_spec(
                 "results/closeup__icecap__scandinavian.yaml",
                 "manuscript_input",
                 "Derived Scandinavian closeup values for manuscript text.",
@@ -123,11 +109,6 @@ def publication_members() -> list[dict[str, str]]:
                 "results/one_year_error_correlation.txt",
                 "manuscript_input",
                 "One-year temporal error correlation used by the manuscript.",
-            ),
-            file_spec(
-                "results/result__greenland_trends.csv",
-                "manuscript_input",
-                "Derived Greenland regional trend values used by manuscript tables.",
             ),
             file_spec(
                 "results/result__regional_trends.csv",
@@ -182,18 +163,12 @@ def publication_members() -> list[dict[str, str]]:
         ]
     )
 
-    expected_figures = sorted(set(GENERATED_MANUSCRIPT_FIGURES + EXTERNAL_MANUSCRIPT_FIGURES))
-    discovered_figures = sorted(
-        path.relative_to(PROJECT_ROOT).as_posix()
-        for suffix in ("*.pdf", "*.png")
-        for path in (PROJECT_ROOT / "paper" / "figures").glob(f"fig*{suffix[1:]}")
-    )
-    for figure_path in sorted(set(expected_figures + discovered_figures)):
+    for figure_path in GENERATED_MANUSCRIPT_FIGURES + EXTERNAL_MANUSCRIPT_FIGURES:
         specs.append(
             file_spec(
                 figure_path,
                 "manuscript_figure",
-                "Rendered manuscript figure included for publication reproduction.",
+                "Retained manuscript figure or geometry panel required for reproduction.",
             )
         )
 
@@ -240,10 +215,13 @@ def format_tree(paths: list[str]) -> str:
     return ".\n" + "\n".join(render(tree))
 
 
-def dataset_readme(archive_paths: list[str]) -> str:
+def dataset_readme(archive_paths: list[str], *, draft: bool = False) -> str:
     tree = format_tree(archive_paths)
+    status = "DRAFT — not for release or publication use" if draft else "Candidate — pending publication"
     return f"""README
 ======
+
+Status: {status}.
 
 Dataset title:
     **Ancilliary data for the reproduction workflow of the article "CryoSwath: a CryoSat-2 swath processor and monthly surface elevation dataset for Arctic mountain glaciers"**
@@ -267,8 +245,8 @@ verifying that reproduced results are consistent with the published
 manuscript. The data are structured in accordance with the workflow:
 `./resources` contains lower-level intermediate data, `./results` are
 directly used to assemble the latex document, and `./paper/figures`
-contain readily processed figures that appear in the rendered
-manuscript.
+contain retained rendered figures and the source panels needed to assemble
+the geometry figure. Membership is explicit; unrelated local files are excluded.
 
 Contents
 --------
@@ -281,7 +259,7 @@ Contents
 
 Ancilliary:
 
-- `CHANGELOG.md`: change record since version 1.
+- `CHANGELOG.md`: candidate change record.
 - `publication_data_manifest.json`: machine-readable inventory.
 - `SHA256SUMS`: checksums for archive members.
 - `LICENSE.txt`: dataset license notice.
@@ -289,18 +267,17 @@ Ancilliary:
 Method
 ------
 
-The current dataset should be used with the Snakemake (Python) workflow
-with DOI 10.4121/fdad7bbe-0deb-43d4-9a41-237be0d60df6. The workflow will
-pull the current dataset when needed. The workflow was developed and tested
-on a 64-bit Linux. It may work on UNIX systems equally well, however you
-will need a virtual machine or `wsl` on Windows. You can obtain a copy
-of the workflow most easily using git by executing the following in a
-shell. On execution, the workflow would appear in a new directory
-`cryoswath_paper_workflow` under your working directory.
+This candidate accompanies the retained-paper Snakemake (Python) workflow.
+It is pending publication; no download URL, DOI, or release version is assigned
+here. Use an explicitly configured local candidate for validation. Draft
+archives built with `--allow-missing` are validation artifacts and must not be
+used for a release or publication reproduction.
 
-```shell
-git clone https://data.4tu.nl/v3/datasets/01e202e0-043f-4865-bd47-98a4b7332cde.git cryoswath_paper_workflow
-```
+`publication_data_manifest.json` lists every required data/figure member, any
+missing members, and the size and SHA-256 digest of each packaged data/figure
+file. `SHA256SUMS` covers every member except itself, including the manifest.
+The builder verifies exact membership, sizes, and checksums before replacing
+the candidate archive.
 
 License
 -------
@@ -335,32 +312,26 @@ def changelog_text() -> str:
     return """\
 # CHANGELOG
 
-All notable changes to this archive since version 1 are documented in
-this file.
+## Candidate — pending publication
 
-## v2 - TODO
-
-- Updated archive metadata and instructions for the second public
-  workflow release, including DOI/version references and the 4TU git
-  clone URL.
-- Added archived reproduction inputs for downloaded source selectors so
-  public reproduction can skip protected or heavyweight processing
-  paths.
-- Fixed the outdated lock file for randomly sampled calibration and
-  validation sites in Alaska and added lock files for all regions.
-- Updated files downstream of the cal/val exercise, affecting reported
-  uncertainties and derived manuscript outputs.
-- Added `fig03__geometry_sketch.png`.
-- Updated rendered manuscript references, bibliography entries, and
-  code/data availability text.
-- Fixed manuscript table and figure issues, including sign conventions
-  and the Figure A2 palette/legend handling.
-- Corrected period-comparison p-values and added their regional CSV
-  for automatically reporting significant changes in the manuscript.
+- Restricted membership to retained manuscript figures, geometry source panels,
+  and their explicit reproduction inputs.
+- Renumbered retained figures and removed Vavilov and dropped regional maps.
+- Removed unused Barnes, Penny, Sukkertoppen, and Greenland manuscript inputs.
+- Added complete membership and checksum verification.
+- Archives built with `--allow-missing` are drafts, never release artifacts.
 """
 
 
 def build_archive(output: Path, allow_missing: bool) -> int:
+    output = output.resolve()
+    original = PROJECT_ROOT / "resources" / "downloads" / "publication_data.zip"
+    if output == original.resolve() or (
+        output.exists() and original.exists() and output.samefile(original)
+    ):
+        print("Refusing to overwrite the original publication_data.zip", file=sys.stderr)
+        return 1
+
     specs = publication_members()
     missing = [
         spec["path"]
@@ -373,7 +344,6 @@ def build_archive(output: Path, allow_missing: bool) -> int:
             print(f"  - {path}", file=sys.stderr)
         return 1
 
-    output = output.resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
 
     manifest_entries = []
@@ -383,7 +353,7 @@ def build_archive(output: Path, allow_missing: bool) -> int:
     ]
     seen_paths = set()
     duplicate_paths = []
-    for spec in existing_specs:
+    for spec in specs:
         if spec["path"] in seen_paths:
             duplicate_paths.append(spec["path"])
         seen_paths.add(spec["path"])
@@ -412,7 +382,7 @@ def build_archive(output: Path, allow_missing: bool) -> int:
         + ["LICENSE.txt", "README.md", "CHANGELOG.md", "publication_data_manifest.json", "SHA256SUMS"]
     )
     docs = {
-        "README.md": dataset_readme(archive_paths).encode("utf-8"),
+        "README.md": dataset_readme(archive_paths, draft=allow_missing).encode("utf-8"),
         "LICENSE.txt": license_text().encode("utf-8"),
         "CHANGELOG.md": changelog_text().encode("utf-8"),
     }
@@ -420,14 +390,17 @@ def build_archive(output: Path, allow_missing: bool) -> int:
     manifest = {
         "title": 'Ancilliary data for the reproduction workflow of the article "CryoSwath: a CryoSat-2 swath processor and monthly surface elevation dataset for Arctic mountain glaciers"',
         "article_title": "CryoSwath: a CryoSat-2 swath processor and monthly surface elevation dataset for Arctic mountain glaciers",
-        "dataset_doi": "10.4121/48892e44-ec2a-434f-bac1-8b7e1507e7d2.v2",
-        "code_release_doi": "10.4121/fdad7bbe-0deb-43d4-9a41-237be0d60df6.v2",
+        "publication_status": "draft" if allow_missing else "candidate_pending_publication",
+        "dataset_doi": None,
+        "code_release_doi": None,
+        "release_version": None,
         "license": "CC-BY-4.0",
         "created_at": datetime.now(timezone.utc)
         .isoformat(timespec="seconds")
         .replace("+00:00", "Z"),
         "generated_by": "tools/create_publication_data_archive.py",
         "archive_name": output.name,
+        "required_members": sorted(spec["path"] for spec in specs),
         "missing_members": missing,
         "files": manifest_entries,
     }
@@ -440,13 +413,37 @@ def build_archive(output: Path, allow_missing: bool) -> int:
 
     docs["SHA256SUMS"] = ("\n".join(sorted(checksum_lines)) + "\n").encode("utf-8")
 
-    with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-        for spec in sorted(existing_specs, key=lambda item: item["path"]):
-            archive.write(PROJECT_ROOT / spec["path"], spec["path"])
-        for arcname in sorted(docs):
-            archive.writestr(arcname, docs[arcname])
+    with tempfile.NamedTemporaryFile(
+        dir=output.parent, prefix=f".{output.name}.", suffix=".tmp", delete=False
+    ) as handle:
+        temporary = Path(handle.name)
+    try:
+        with zipfile.ZipFile(temporary, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+            for spec in sorted(existing_specs, key=lambda item: item["path"]):
+                archive.write(PROJECT_ROOT / spec["path"], spec["path"])
+            for arcname in sorted(docs):
+                archive.writestr(arcname, docs[arcname])
 
-    print(f"Wrote {output}")
+        with zipfile.ZipFile(temporary) as archive:
+            if sorted(archive.namelist()) != archive_paths:
+                raise ValueError("Archive membership does not match the explicit inventory")
+            expected = {
+                entry["path"]: (entry["size_bytes"], entry["sha256"])
+                for entry in manifest_entries
+            }
+            expected.update(
+                (name, (len(data), sha256_bytes(data))) for name, data in docs.items()
+            )
+            for name, (size, checksum) in expected.items():
+                with archive.open(name) as member:
+                    actual = hashlib.file_digest(member, "sha256").hexdigest()
+                if archive.getinfo(name).file_size != size or actual != checksum:
+                    raise ValueError(f"Archive size/checksum mismatch for {name}")
+        temporary.replace(output)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+    print(f"Wrote {'DRAFT (not for release)' if allow_missing else 'candidate (pending publication)'}: {output}")
     print(f"Packaged {len(existing_specs)} data/figure files and {len(docs)} docs")
     if missing:
         print(f"Skipped {len(missing)} missing members because --allow-missing was set")

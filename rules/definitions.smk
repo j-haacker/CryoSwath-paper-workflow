@@ -98,7 +98,7 @@ MANUSCRIPT_EXTERNAL_FIGURE_MANIFEST = "paper/external_figures.txt"
 TREND_DATASET_ARCHIVE_URL = (
     "https://data.4tu.nl/ndownloader/items/85738a14-6652-4e0c-8552-d6fc729141b3/versions/3"
 )
-PUBLICATION_DATA_URL = (
+PUBLICATION_DATA_URL = config.get("publication_data_url") or (
     "https://data.4tu.nl/file/48892e44-ec2a-434f-bac1-8b7e1507e7d2/df7d357e-f828-4cb5-acb3-dd3a4364530e"
 )
 AVERAGE_ELEVATION_FILENAME = (
@@ -230,16 +230,6 @@ def download_archive_members(url, archive_path, destinations, log_path):
                 "archive is missing required files:\n" + "\n".join(sorted(missing))
             )
 
-        for destination_path in destination_paths:
-            destination_path.parent.mkdir(parents=True, exist_ok=True)
-            archive_member = members_by_destination[destination_path]
-            log_message(f"Extracting {archive_member} -> {destination_path}")
-            with (
-                archive.open(archive_member) as src_handle,
-                destination_path.open("wb") as dst_handle,
-            ):
-                shutil.copyfileobj(src_handle, dst_handle)
-
         validated = 0
         for destination_path, archive_member in members_by_destination.items():
             checksum = expected_sha256_by_member.get(archive_member)
@@ -250,8 +240,11 @@ def download_archive_members(url, archive_path, destinations, log_path):
                     rel_member = destination_path.as_posix()
                 checksum = expected_sha256_by_member.get(rel_member)
             if checksum is None:
+                if expected_sha256_by_member:
+                    raise ValueError(f"Missing checksum for {archive_member}")
                 continue
-            actual = hashlib.sha256(destination_path.read_bytes()).hexdigest()
+            with archive.open(archive_member) as member:
+                actual = hashlib.file_digest(member, "sha256").hexdigest()
             if actual != checksum:
                 raise ValueError(
                     f"checksum mismatch for {destination_path}: "
@@ -260,6 +253,17 @@ def download_archive_members(url, archive_path, destinations, log_path):
             validated += 1
         if expected_sha256_by_member:
             log_message(f"Validated {validated} extracted files against checksums")
+
+        for destination_path in destination_paths:
+            destination_path.parent.mkdir(parents=True, exist_ok=True)
+            archive_member = members_by_destination[destination_path]
+            log_message(f"Extracting {archive_member} -> {destination_path}")
+            with (
+                archive.open(archive_member) as src_handle,
+                destination_path.open("wb") as dst_handle,
+            ):
+                shutil.copyfileobj(src_handle, dst_handle)
+
 
     archive_path.unlink(missing_ok=True)
 
@@ -304,32 +308,26 @@ CURRENT_SOURCE_CALVAL_TEMPORAL = [
 CURRENT_SOURCE_COVERAGE_ANALYSIS = "<results>/coverage_analysis.csv"
 
 MANUSCRIPT_GENERATED_FIGURES = [
-    "paper/figures/fig02__example__wf_start.pdf",
-    "paper/figures/fig03__geometry_sketch.png",
-    "paper/figures/fig04__arctic-wide_time_series.pdf",
-    "paper/figures/fig05__regional_time_series.pdf",
-    "paper/figures/fig15__vatna_hugonnet_stat_comparison.pdf",
-    "paper/figures/fig16__coverage_terraincomplexity_correlation.pdf",
-    "paper/figures/figA1__bias_by_interp_type.pdf",
-    "paper/figures/figA2__one_year_error_correlation.pdf",
-    "paper/figures/figA3__vavilov_feature.pdf",
+    "paper/figures/fig01__example__wf_start.pdf",
+    "paper/figures/fig02__geometry_sketch.png",
+    "paper/figures/fig03__arctic-wide_time_series.pdf",
+    "paper/figures/fig04__regional_time_series.pdf",
+    "paper/figures/fig07__vatna_hugonnet_stat_comparison.pdf",
+    "paper/figures/fig08__coverage_terraincomplexity_correlation.pdf",
+    "paper/figures/figA2__bias_by_interp_type.pdf",
+    "paper/figures/figA3__one_year_error_correlation.pdf",
 ]
 
 MANUSCRIPT_EXTERNAL_FIGURES = read_manifest_list(MANUSCRIPT_EXTERNAL_FIGURE_MANIFEST)
 
 PUBLICATION_ARCHIVED_FIGURES = [
-    "paper/figures/fig02__example__wf_start.pdf",
-    "paper/figures/fig15__vatna_hugonnet_stat_comparison.pdf",
-    "paper/figures/figA3__vavilov_feature.pdf",
+    "paper/figures/fig01__example__wf_start.pdf",
+    "paper/figures/fig07__vatna_hugonnet_stat_comparison.pdf",
 ]
 
 PUBLICATION_ARCHIVED_MANUSCRIPT_INPUTS = [
-    "<results>/closeup__icecap__barnes.yaml",
-    "<results>/closeup__icecap__penny.yaml",
-    "<results>/closeup__icecap__sukkerqara.yaml",
     "<results>/closeup__icecap__scandinavian.yaml",
     "<results>/omitted_subregions.csv",
-    "<results>/result__greenland_trends.csv",
     "<results>/result__regional_trends.csv",
     "<results>/result__period_comparison_p_values.csv",
     "<results>/result__value_collection.yaml",
@@ -345,12 +343,12 @@ PUBLICATION_ARCHIVED_OUTPUTS = [
 ]
 
 PUBLICATION_RERUNNABLE_FIGURES = [
-    "paper/figures/fig04__arctic-wide_time_series.pdf",
-    "paper/figures/fig03__geometry_sketch.png",
-    "paper/figures/fig05__regional_time_series.pdf",
-    "paper/figures/fig16__coverage_terraincomplexity_correlation.pdf",
-    "paper/figures/figA1__bias_by_interp_type.pdf",
-    "paper/figures/figA2__one_year_error_correlation.pdf",
+    "paper/figures/fig03__arctic-wide_time_series.pdf",
+    "paper/figures/fig02__geometry_sketch.png",
+    "paper/figures/fig04__regional_time_series.pdf",
+    "paper/figures/fig08__coverage_terraincomplexity_correlation.pdf",
+    "paper/figures/figA2__bias_by_interp_type.pdf",
+    "paper/figures/figA3__one_year_error_correlation.pdf",
 ]
 
 PUBLICATION_REPRODUCTION_OUTPUTS = [

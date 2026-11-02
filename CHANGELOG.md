@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Updated
+
+- Renumbered retained figures to 1–8 and A1–A4, including scripts and workflow paths.
+- Removed dropped figures and unused manuscript-only analysis paths.
+- Restricted the publication-data archive to explicit required members, with
+  membership and checksum verification before replacing the archive.
+- Enabled local archive URL overrides and external-figure downloads in both
+  reproduction modes.
+
 ### Fixed
 
 - Revised Snakemake `ancient()` markers so downloaded trend rasters are

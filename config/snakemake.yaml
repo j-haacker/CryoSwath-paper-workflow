@@ -7,6 +7,10 @@ glacierized_area_source: downloaded
 elevation_timeseries_source: downloaded
 publication_artifact_source: downloaded
 
+# Optional archive URL; file:///absolute/path/archive.zip accepts a local copy.
+# Leave empty to use the published archive.
+publication_data_url: ""
+
 # Set to false only when an upstream HTTPS certificate is broken and you accept
 # the risk of downloading monthly source data without TLS certificate checks.
 download_verify_tls: true

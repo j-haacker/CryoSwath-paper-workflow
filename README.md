@@ -82,15 +82,15 @@ The first command shows the planned work without changing outputs. The second
 downloads the public reproduction archive, validates its checksums,
 reruns the lightweight figure paths, and requires neither Earthdata
 nor ESA credentials. Produced source selectors below document which opt-in
-paths need credentials or large local resources. A successful run produces
-`paper/manuscript.tex` and the following figures:
+paths need credentials or large local resources. A successful run produces `paper/manuscript.tex`, all twelve retained manuscript
+figures, and the geometry source panels. The following figures are regenerated:
 
-- `paper/figures/fig03__geometry_sketch.png`
-- `paper/figures/fig04__arctic-wide_time_series.pdf`
-- `paper/figures/fig05__regional_time_series.pdf`
-- `paper/figures/fig16__coverage_terraincomplexity_correlation.pdf`
-- `paper/figures/figA1__bias_by_interp_type.pdf`
-- `paper/figures/figA2__one_year_error_correlation.pdf`
+- `paper/figures/fig02__geometry_sketch.png`
+- `paper/figures/fig03__arctic-wide_time_series.pdf`
+- `paper/figures/fig04__regional_time_series.pdf`
+- `paper/figures/fig08__coverage_terraincomplexity_correlation.pdf`
+- `paper/figures/figA2__bias_by_interp_type.pdf`
+- `paper/figures/figA3__one_year_error_correlation.pdf`
 
 ## Credentials
 
@@ -124,7 +124,7 @@ earthdata_password: ""
 ### ESA CryoSat-2 L1b
 
 ESA CryoSat-2 L1b downloads, including
-`fig02__coherence_waveform_examples`, use ESA EOIAM credentials. Environment
+`fig01__coherence_waveform_examples`, use ESA EOIAM credentials. Environment
 variables are the recommended setup:
 
 ```bash
@@ -240,14 +240,14 @@ pixi run snakemake resources/o2region__area_km2.csv --cores 1 --sdm conda --conf
 ```
 
 ```bash
-pixi run snakemake paper/figures/fig16__coverage_terraincomplexity_correlation.pdf --cores 1 --sdm conda --config coverage_analysis_source=produced
+pixi run snakemake paper/figures/fig08__coverage_terraincomplexity_correlation.pdf --cores 1 --sdm conda --config coverage_analysis_source=produced
 ```
 
 Rebuild the Arctic-wide time-series figure using a locally reproduced elevation
 time-series table and downloaded cal/val summaries:
 
 ```bash
-pixi run snakemake paper/figures/fig04__arctic-wide_time_series.pdf --cores 1 --sdm conda --config elevation_timeseries_source=produced calval_source=downloaded
+pixi run snakemake paper/figures/fig03__arctic-wide_time_series.pdf --cores 1 --sdm conda --config elevation_timeseries_source=produced calval_source=downloaded
 ```
 
 Advanced produced cal/val example; this is credentialed and can be very
@@ -262,9 +262,9 @@ pixi run snakemake results/one_year_error_correlation.txt --cores 1 --sdm conda 
 | Target family | Source selectors that usually matter |
 | --- | --- |
 | `results/one_year_error_correlation.txt`, `paper/figures/figA1__*.pdf`, `paper/figures/figA2__*.pdf` | `calval_source` |
-| `paper/figures/fig04__*.pdf`, `paper/figures/fig05__*.pdf` | `glacierized_area_source`, `elevation_timeseries_source`; `elevation_timeseries_source=produced` also follows `calval_source` |
+| `paper/figures/fig03__*.pdf`, `paper/figures/fig04__*.pdf` | `glacierized_area_source`, `elevation_timeseries_source`; `elevation_timeseries_source=produced` also follows `calval_source` |
 | `results/tabA2__subregion_overview.tex` | Published trend rasters are downloaded by default |
-| `paper/figures/fig16__*.pdf`, `results/coverage_analysis.csv` | `coverage_analysis_source`; published trend rasters are downloaded by default |
+| `paper/figures/fig08__*.pdf`, `results/coverage_analysis.csv` | `coverage_analysis_source`; published trend rasters are downloaded by default |
 | `publication_reproduction` | Default downloaded source selectors plus `publication_artifact_source`; no credentials when the publication archive is configured |
 | `paper/manuscript.pdf` | `calval_source`, `coverage_analysis_source`, `glacierized_area_source`, `elevation_timeseries_source`, `publication_artifact_source`; published trend rasters are downloaded by default |
 

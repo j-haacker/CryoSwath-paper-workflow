@@ -40,7 +40,7 @@ sns.set_context("paper")
 
 snakemake_fallback = snakemake_fallback_builder(globals())
 
-OUTPUT_FIGURE = str(project_path("figures", "fig02__example__wf_start.pdf"))
+OUTPUT_FIGURE = str(project_path("figures", "fig01__example__wf_start.pdf"))
 PANEL_LABELS = ("a", "b")
 WAVEFORM_SPECS = (
     {
