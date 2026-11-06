@@ -22,6 +22,7 @@ results
 resources
 data
 config.ini
+/config/credentials.yaml
 nohup_*
 
 /paper/copernicus.*

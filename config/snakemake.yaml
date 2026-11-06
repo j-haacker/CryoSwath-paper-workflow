@@ -7,7 +7,7 @@ glacierized_area_source: downloaded
 elevation_timeseries_source: downloaded
 publication_artifact_source: downloaded
 
-# Optional archive URL; file:///absolute/path/archive.zip accepts a local copy.
+# Optional archive URL, e.g. file:///absolute/path/publication_data_v2.zip.
 # Leave empty to use the published archive.
 publication_data_url: ""
 
@@ -15,8 +15,8 @@ publication_data_url: ""
 # the risk of downloading monthly source data without TLS certificate checks.
 download_verify_tls: true
 
-# Optional Earthdata credentials for NSIDC authentication.
-# Resolution order is:
-# 1) these config values, 2) env vars, 3) $HOME/.netrc, 4) ./.netrc, 5) ./.nsidc_cookies
+# Credentials belong in Git-ignored config/credentials.yaml or environment variables.
+# Empty placeholders are removed before Snakemake serializes job configuration.
 earthdata_username: ""
 earthdata_password: ""
+maap_token: ""

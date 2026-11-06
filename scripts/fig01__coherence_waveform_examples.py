@@ -29,6 +29,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from cryoswath_paper_workflow.workflow_support import (
+    configure_credentials,
     out_to_snakemake_log_or_fallback_stdout,
     project_path,
     snakemake_fallback_builder,
@@ -209,6 +210,7 @@ def make_figure():
 
 
 def main():
+    configure_credentials()
     warn_if_esa_credentials_missing_for_l1b(
         [spec["track_id"] for spec in WAVEFORM_SPECS]
     )

@@ -7,7 +7,10 @@ import tempfile
 import netrc as netrc_mod
 import sys
 import argparse
-from typing import Mapping, Any
+from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from cryoswath_paper_workflow.workflow_support import configure_credentials
 
 try:
     from snakemake.exceptions import WorkflowError
@@ -35,7 +38,6 @@ def _run_wget(cmd: list[str], log_path: Path) -> bool:
 def _build_common_download_cmd(tmp_target: Path) -> list[str]:
     return [
         "--keep-session-cookies",
-        "--no-check-certificate",
         "--auth-no-challenge=on",
         "-e",
         "robots=off",
@@ -63,8 +65,8 @@ def _store_cookie(tmp_cookie: Path, cookie_out: Path):
 def _netrc_machine_state(netrc_path: Path) -> tuple[bool, str]:
     try:
         parsed = netrc_mod.netrc(str(netrc_path))
-    except Exception as exc:  # noqa: BLE001
-        return False, f"cannot parse netrc file ({exc})."
+    except Exception:  # noqa: BLE001
+        return False, "cannot parse netrc file."
     if parsed.authenticators(NETRC_MACHINE) is None:
         return False, f"missing machine '{NETRC_MACHINE}' entry."
     return True, "machine entry present."
@@ -105,8 +107,8 @@ def _raise_partial_error(source_name: str, user_is_set: bool, pass_is_set: bool)
     if not pass_is_set:
         missing_parts.append("password")
     key_hint = (
-        "`earthdata_username`/`earthdata_password`"
-        if source_name == "Config"
+        f"netrc machine '{NETRC_MACHINE}'"
+        if source_name == "Netrc"
         else "`EARTHDATA_USERNAME`/`EARTHDATA_PASSWORD`"
     )
     raise WorkflowError(
@@ -152,11 +154,24 @@ def _try_username_password_source(
         return False
 
     _log_line(log_path, f"{source_label}: source found, validating.")
-    if _validate_with_wget_auth(
-        ["--http-user", username, "--http-password", password],
-        output_cookie,
-        log_path,
-    ):
+    if any(character in username + password for character in "\r\n"):
+        raise WorkflowError("Earthdata credentials must not contain line breaks")
+    with tempfile.NamedTemporaryFile(mode="w", prefix="nsidc_wgetrc_", encoding="utf-8") as auth_file:
+        system_config = Path(shutil.which("wget") or "/usr/bin/wget").absolute().parents[1] / "etc/wgetrc"
+        if not system_config.is_file():
+            system_config = Path("/etc/wgetrc")
+        user_config = Path(os.environ.get("WGETRC", str(Path.home() / ".wgetrc")))
+        for config_path in (system_config, user_config):
+            if config_path.is_file():
+                auth_file.write(config_path.read_text() + "\n")
+        auth_file.write(
+            f"http_user = {username}\nhttp_password = {password}\n"
+        )
+        auth_file.flush()
+        authenticated = _validate_with_wget_auth(
+            ["--config", auth_file.name], output_cookie, log_path
+        )
+    if authenticated:
         _log_line(log_path, f"{source_label}: authentication succeeded.")
         return True
     _log_line(log_path, f"{source_label}: source found but authentication failed.")
@@ -198,15 +213,10 @@ def _try_netrc_source(
             f"{source_label}: source found but authentication failed ({netrc_message})",
         )
         return False
-    if _validate_with_wget_auth(
-        ["--netrc-file", str(netrc_path)],
-        output_cookie,
-        log_path,
-    ):
-        _log_line(log_path, f"{source_label}: authentication succeeded.")
-        return True
-    _log_line(log_path, f"{source_label}: source found but authentication failed.")
-    return False
+    username, _, password = netrc_mod.netrc(str(netrc_path)).authenticators(NETRC_MACHINE)
+    return _try_username_password_source(
+        source_label, "Netrc", username or "", password or "", output_cookie, log_path
+    )
 
 
 def _try_cookie_source(
@@ -234,24 +244,14 @@ def _try_cookie_source(
 def _resolve_cookie(
     output_cookie: Path,
     log_path: Path,
-    config: Mapping[str, Any],
+    config: dict[str, Any],
     allow_interactive_helper: bool = True,
 ):
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with open(log_path, "w", encoding="utf-8") as logf:
         logf.write("")
 
-    cfg_user = _as_stripped_nonempty(config.get("earthdata_username"))
-    cfg_pass = _as_stripped_nonempty(config.get("earthdata_password"))
-    if _try_username_password_source(
-        source_label="config credentials",
-        partial_error_source_name="Config",
-        username=cfg_user,
-        password=cfg_pass,
-        output_cookie=output_cookie,
-        log_path=log_path,
-    ):
-        return
+    configure_credentials(config)
 
     env_user = _as_stripped_nonempty(os.environ.get("EARTHDATA_USERNAME"))
     env_pass = _as_stripped_nonempty(os.environ.get("EARTHDATA_PASSWORD"))
@@ -313,8 +313,8 @@ def _resolve_cookie(
     raise WorkflowError(
         "Could not authenticate with NSIDC Earthdata credentials.\n"
         "Checked in order: "
-        "config (earthdata_username/earthdata_password), "
-        "environment (EARTHDATA_USERNAME/EARTHDATA_PASSWORD), "
+        "environment (EARTHDATA_USERNAME/EARTHDATA_PASSWORD, including "
+        "config/credentials.yaml defaults), "
         "$HOME/.netrc, ./.netrc, ./.nsidc_cookies.\n"
         "Snakemake runs this resolver noninteractively. To use a one-time "
         "credential prompt, run it directly outside Snakemake:\n"
@@ -351,16 +351,6 @@ def _parse_args() -> argparse.Namespace:
         help="Log file path (default: logs/nsidc_cookies.log).",
     )
     parser.add_argument(
-        "--earthdata-username",
-        default="",
-        help="Optional username to use as highest-priority config source.",
-    )
-    parser.add_argument(
-        "--earthdata-password",
-        default="",
-        help="Optional password to use as highest-priority config source.",
-    )
-    parser.add_argument(
         "--no-interactive-helper",
         action="store_true",
         help="Disable automatic one-time interactive helper fallback.",
@@ -370,14 +360,10 @@ def _parse_args() -> argparse.Namespace:
 
 def _run_from_cli():
     args = _parse_args()
-    config = {
-        "earthdata_username": args.earthdata_username,
-        "earthdata_password": args.earthdata_password,
-    }
     _resolve_cookie(
         output_cookie=Path(args.output),
         log_path=Path(args.log),
-        config=config,
+        config={},
         allow_interactive_helper=not args.no_interactive_helper,
     )
     print(f"Created/updated cookie file: {args.output}")

@@ -1,6 +1,7 @@
 from pathlib import Path
 import re
 from cryoswath_paper_workflow.workflow_support import (
+    configure_credentials,
     make_o2reg_filename_token_list,
     o1o2reg_tuple_list,
     rgi_names,
@@ -8,7 +9,8 @@ from cryoswath_paper_workflow.workflow_support import (
 )
 import yaml
 
-config.update(config.get("_source_overrides", {}))
+config.update(config.pop("_source_overrides", {}))
+configure_credentials(config)
 
 
 def resolve_calval_source(config):

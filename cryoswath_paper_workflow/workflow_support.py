@@ -29,6 +29,7 @@ _ESA_CS2_HOST = "science-pds.cryosat.esa.int"
 _ESA_CRYOSWATH_KEYRING_SERVICE = "cryoswath.esa"
 _ESA_ENV_USER = "EOIAM_USER"
 _ESA_ENV_PASSWORD = "EOIAM_PASSWORD"
+_MAAP_TOKEN_ENV = "ESA_MAAP_OFFLINE_TOKEN"
 _ESA_KEYRING_SERVICE_CANDIDATES = (
     _ESA_AUTH_IDP_HOST,
     _ESA_CS2_HOST,
@@ -76,6 +77,48 @@ PROJECT_ROOT = _find_project_root()
 
 def project_path(*parts: str | Path) -> Path:
     return PROJECT_ROOT.joinpath(*parts)
+
+
+def configure_credentials(
+    config: dict | None = None, *, credentials_path: Path | str | None = None
+) -> None:
+    """Load private credentials into the environment, never the job config."""
+    keys = ("maap_token", "earthdata_username", "earthdata_password")
+    if config is not None:
+        public_values = [config.pop(key, None) for key in keys]
+        if any(public_values):
+            raise ValueError("Move credentials from workflow config to config/credentials.yaml")
+
+    path = (
+        Path(credentials_path)
+        if credentials_path is not None
+        else project_path("config", "credentials.yaml")
+    )
+    try:
+        credentials = yaml.safe_load(path.read_text()) if path.exists() else {}
+        if credentials is None:
+            credentials = {}
+    except yaml.YAMLError:
+        raise ValueError("Invalid YAML in private credential file") from None
+    if not isinstance(credentials, dict) or set(credentials) - set(keys):
+        raise ValueError("Private credential file must contain only maap_token and Earthdata fields")
+    if any(value is not None and not isinstance(value, str) for value in credentials.values()):
+        raise ValueError("Private credential values must be strings")
+
+    token = credentials.get("maap_token") or ""
+    user = os.environ.get("EARTHDATA_USERNAME") or ""
+    password = os.environ.get("EARTHDATA_PASSWORD") or ""
+    if not user and not password:
+        user = credentials.get("earthdata_username") or ""
+        password = credentials.get("earthdata_password") or ""
+    if bool(user) != bool(password):
+        raise ValueError("Earthdata username and password must both be configured in the same source")
+
+    if token and not os.environ.get(_MAAP_TOKEN_ENV):
+        os.environ[_MAAP_TOKEN_ENV] = token
+    if user and password:
+        os.environ["EARTHDATA_USERNAME"] = user
+        os.environ["EARTHDATA_PASSWORD"] = password
 
 
 def configure_cryoswath_resource_paths() -> None:
@@ -127,6 +170,9 @@ def _keyring_esa_credential_status(
 
     def check_keyring():
         try:
+            if keyring.get_password("iam.maap.eo.esa.int", "offline-token"):
+                result["source"] = "MAAP token in keyring"
+                return
             explicit_users = [env_user] if env_user else []
             for service in _ESA_KEYRING_SERVICE_CANDIDATES:
                 for user in explicit_users:
@@ -138,8 +184,8 @@ def _keyring_esa_credential_status(
                     if keyring_user and keyring.get_password(service, keyring_user):
                         result["source"] = f"keyring service {service}"
                         return
-        except Exception as err:  # noqa: BLE001
-            result["note"] = f"keyring unavailable ({err})"
+        except Exception:  # noqa: BLE001
+            result["note"] = "keyring unavailable"
 
     thread = threading.Thread(target=check_keyring, daemon=True)
     thread.start()
@@ -220,6 +266,8 @@ def resolve_esa_credential_status(
     over the network or print secret values.
     """
     notes: list[str] = []
+    if os.environ.get(_MAAP_TOKEN_ENV):
+        return EsaCredentialStatus(True, f"environment variable {_MAAP_TOKEN_ENV}")
     env_status = _nonempty_env_pair(_ESA_ENV_USER, _ESA_ENV_PASSWORD)
     if env_status.available:
         return env_status
@@ -305,9 +353,11 @@ def warn_if_esa_credentials_missing_for_l1b(
         "missing for track(s) "
         f"{', '.join(missing_track_ids)}. The workflow will continue, but "
         "cryoswath may try to download these files and can fail or appear to "
-        "stall without authentication. Configure EOIAM_USER/EOIAM_PASSWORD, "
-        f"keyring, $HOME/.netrc with machine {_ESA_CS2_HOST}, or legacy "
-        "config.ini [user] credentials."
+        "stall without authentication. Configure maap_token in config/credentials.yaml, "
+        "ESA_MAAP_OFFLINE_TOKEN, or cryoswath update-maap-token for MAAP delivery. "
+        "EOIAM_USER/EOIAM_PASSWORD, keyring, "
+        f"$HOME/.netrc with machine {_ESA_CS2_HOST}, or legacy config.ini "
+        "[user] credentials support Science Server FTP fallback."
         f"{note}",
         UserWarning,
         stacklevel=2,
