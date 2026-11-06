@@ -136,11 +136,6 @@ rule download_monthly_dataset:
 
 
 rule download_trends_dataset:
-    input:
-        [
-            str(TREND_DATASET_LOCAL_DIR / Path(pathvar_path(path)).name)
-            for path in TREND_DATASET_OUTPUTS
-        ] if TREND_DATASET_LOCAL_DIR else [],
     output:
         TREND_DATASET_OUTPUTS,
     params:
@@ -149,23 +144,12 @@ rule download_trends_dataset:
     log:
         "<logs>/download_trends_dataset.log",
     run:
-        if TREND_DATASET_LOCAL_DIR:
-            import shutil
-
-            Path(log[0]).parent.mkdir(parents=True, exist_ok=True)
-            with Path(log[0]).open("w", encoding="utf-8") as handle:
-                handle.write(f"Local trend dataset source: {TREND_DATASET_LOCAL_DIR}\n")
-                for source, destination in zip(input, output):
-                    Path(destination).parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copyfile(source, destination)
-                    handle.write(f"Copied {source} to {destination}\n")
-        else:
-            download_archive_members(
-                url=params.url,
-                archive_path=params.archive,
-                destinations=list(output),
-                log_path=log[0],
-            )
+        download_archive_members(
+            url=params.url,
+            archive_path=params.archive,
+            destinations=list(output),
+            log_path=log[0],
+        )
 
 
 if PUBLICATION_ARTIFACT_SOURCE == "produced":

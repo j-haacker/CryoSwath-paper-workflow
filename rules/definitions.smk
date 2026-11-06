@@ -98,7 +98,7 @@ CRYOSWATH_AUX_FILES = [
 
 MANUSCRIPT_EXTERNAL_FIGURE_MANIFEST = "paper/external_figures.txt"
 TREND_DATASET_ARCHIVE_URL = (
-    "https://data.4tu.nl/ndownloader/items/85738a14-6652-4e0c-8552-d6fc729141b3/versions/3"
+    "https://data.4tu.nl/ndownloader/items/85738a14-6652-4e0c-8552-d6fc729141b3/versions/4"
 )
 PUBLICATION_DATA_URL = config.get("publication_data_url") or (
     "https://data.4tu.nl/file/48892e44-ec2a-434f-bac1-8b7e1507e7d2/df7d357e-f828-4cb5-acb3-dd3a4364530e"
@@ -289,11 +289,6 @@ rgi_shapefile_tokens = [
 ]
 
 TREND_RASTERS = [local_trend_path(token) for token in filename_tokens]
-TREND_DATASET_LOCAL_DIR = config.get("trend_dataset_local_dir")
-if TREND_DATASET_LOCAL_DIR:
-    TREND_DATASET_LOCAL_DIR = (REPO_ROOT / TREND_DATASET_LOCAL_DIR).resolve()
-    if TREND_DATASET_LOCAL_DIR == Path(pathvar_path("<resources>/trends_dataset")).resolve():
-        raise ValueError("trend_dataset_local_dir must differ from the output directory")
 CURRENT_SOURCE_AREA_TABLE = f"<resources>/{AREA_FILENAME}"
 CURRENT_SOURCE_AVG_TABLE = f"<resources>/{AVERAGE_ELEVATION_FILENAME}"
 TREND_DATASET_OUTPUTS = [
