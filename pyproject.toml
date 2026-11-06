@@ -16,7 +16,7 @@ platforms = ["linux-64", "osx-64", "osx-arm64"]
 [tool.pixi.dependencies]
 aria2 = ">=1.37.0,<2"
 conda = ">=26.5.0,<27"
-cryoswath = "==0.2.7"
+cryoswath = "==0.2.10"
 dask = ">=2026.1.2,<2027"
 distributed = ">=2026.1.2,<2027"
 graphviz = ">=13,<15"
