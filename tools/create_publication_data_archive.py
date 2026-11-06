@@ -14,7 +14,16 @@ import zipfile
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_OUTPUT = PROJECT_ROOT / "resources" / "downloads" / "publication_data_candidate.zip"
+METADATA = {
+    "title": 'Ancillary data for the reproduction workflow of the article "CryoSwath: a CryoSat-2 swath processor and monthly surface elevation dataset for Arctic mountain glaciers"',
+    "release_version": "2",
+    "dataset_doi": "10.4121/48892e44-ec2a-434f-bac1-8b7e1507e7d2.v2",
+    "code_release_doi": "https://doi.org/10.4121/fdad7bbe-0deb-43d4-9a41-237be0d60df6.v2",
+    "code_repo_url": "https://data.4tu.nl/v3/datasets/01e202e0-043f-4865-bd47-98a4b7332cde.git",
+    "article_doi": "10.5194/egusphere-2026-5522",
+    "dataset_concept_doi": "10.4121/48892e44-ec2a-434f-bac1-8b7e1507e7d2",
+    "code_concept_doi": "10.4121/fdad7bbe-0deb-43d4-9a41-237be0d60df6",
+}
 
 
 RGI_TOKENS = [
@@ -217,14 +226,36 @@ def format_tree(paths: list[str]) -> str:
 
 def dataset_readme(archive_paths: list[str], *, draft: bool = False) -> str:
     tree = format_tree(archive_paths)
-    status = "DRAFT — not for release or publication use" if draft else "Candidate — pending publication"
+    status = "Status: DRAFT — not for release or publication use.\n\n" if draft else ""
+    metadata_lines = "\n".join(
+        f"{label}: {METADATA[key]}"
+        for key, label in (
+            ("release_version", "Release version"),
+            ("dataset_doi", "Dataset release DOI"),
+            ("code_release_doi", "Workflow release DOI"),
+            ("article_doi", "Article DOI"),
+            ("dataset_concept_doi", "Dataset concept DOI"),
+            ("code_concept_doi", "Workflow concept DOI"),
+        )
+        if METADATA[key]
+        and not (key == "dataset_concept_doi" and METADATA["dataset_doi"])
+        and not (key == "code_concept_doi" and METADATA["code_release_doi"])
+    )
+    git_instructions = f""" You can obtain a copy
+of the workflow most easily using git by executing the following in a
+shell. On execution, the workflow would appear in a new directory
+`cryoswath_paper_workflow` under your working directory.
+
+```shell
+git clone {METADATA["code_repo_url"]} cryoswath_paper_workflow
+```""" if METADATA["code_repo_url"] else ""
     return f"""README
 ======
 
-Status: {status}.
+{status}Dataset title:
+    **{METADATA["title"]}**
 
-Dataset title:
-    **Ancilliary data for the reproduction workflow of the article "CryoSwath: a CryoSat-2 swath processor and monthly surface elevation dataset for Arctic mountain glaciers"**
+{metadata_lines}
 
 Structure:
 
@@ -245,8 +276,8 @@ verifying that reproduced results are consistent with the published
 manuscript. The data are structured in accordance with the workflow:
 `./resources` contains lower-level intermediate data, `./results` are
 directly used to assemble the latex document, and `./paper/figures`
-contain retained rendered figures and the source panels needed to assemble
-the geometry figure. Membership is explicit; unrelated local files are excluded.
+contain readily processed figures that appear in the rendered
+manuscript.
 
 Contents
 --------
@@ -259,7 +290,7 @@ Contents
 
 Ancilliary:
 
-- `CHANGELOG.md`: candidate change record.
+- `CHANGELOG.md`: change record since version 1.
 - `publication_data_manifest.json`: machine-readable inventory.
 - `SHA256SUMS`: checksums for archive members.
 - `LICENSE.txt`: dataset license notice.
@@ -267,17 +298,11 @@ Ancilliary:
 Method
 ------
 
-This candidate accompanies the retained-paper Snakemake (Python) workflow.
-It is pending publication; no download URL, DOI, or release version is assigned
-here. Use an explicitly configured local candidate for validation. Draft
-archives built with `--allow-missing` are validation artifacts and must not be
-used for a release or publication reproduction.
-
-`publication_data_manifest.json` lists every required data/figure member, any
-missing members, and the size and SHA-256 digest of each packaged data/figure
-file. `SHA256SUMS` covers every member except itself, including the manifest.
-The builder verifies exact membership, sizes, and checksums before replacing
-the candidate archive.
+The current dataset should be used with the Snakemake (Python) workflow
+with DOI {METADATA['code_release_doi'] or METADATA['code_concept_doi']}. The workflow will
+pull the current dataset when needed. The workflow was developed and tested
+on a 64-bit Linux. It may work on UNIX systems equally well, however you
+will need a virtual machine or `wsl` on Windows.{git_instructions}
 
 License
 -------
@@ -308,22 +333,68 @@ datasets used to derive them.
 """
 
 
-def changelog_text() -> str:
-    return """\
+def changelog_text(created_at: str) -> str:
+    version = METADATA["release_version"]
+    heading = f"v{version} - {created_at}" if version else "Unreleased"
+    return f"""\
 # CHANGELOG
 
-## Candidate — pending publication
+## {heading}
 
-- Restricted membership to retained manuscript figures, geometry source panels,
-  and their explicit reproduction inputs.
-- Renumbered retained figures and removed Vavilov and dropped regional maps.
-- Removed unused Barnes, Penny, Sukkertoppen, and Greenland manuscript inputs.
-- Added complete membership and checksum verification.
-- Archives built with `--allow-missing` are drafts, never release artifacts.
+- Updated archive metadata and instructions for the second public
+  workflow release, including DOI/version references and the 4TU git
+  clone URL.
+- Added archived reproduction inputs so public reproduction can skip
+  protected or computationally expensive processing paths.
+- Fixed the outdated Alaska calibration/validation selection lock and
+  added selection lock files for all regions.
+- Updated calibration/validation outputs and downstream uncertainties
+  and derived manuscript results.
+- Added the combined geometry sketch, `fig02__geometry_sketch.png`.
+- Renumbered manuscript figures to 1–8 and A1–A4; removed Vavilov and
+  regional maps no longer used in the manuscript.
+- Restricted archive membership to manuscript figures, geometry source
+  panels, and required reproduction inputs; removed unused Barnes, Penny,
+  Sukkertoppen, and Greenland manuscript inputs.
+- Updated manuscript references, bibliography entries, and code/data
+  availability text.
+- Fixed table sign conventions and the temporal-correlation figure's
+  region palette and legend.
+- Corrected period-comparison p-values and added their regional CSV
+  for automatically reporting significant changes in the manuscript.
+- Added complete membership and checksum verification before archive replacement.
+
+
+## v1 - 2026-05-29
+
+Initial release.
+
 """
 
 
-def build_archive(output: Path, allow_missing: bool) -> int:
+def build_archive(output: Path | None, allow_missing: bool) -> int:
+    if not allow_missing:
+        missing_metadata = [
+            key for key in ("release_version", "dataset_doi")
+            if not METADATA[key].strip()
+        ]
+        if missing_metadata:
+            print(
+                "Fill METADATA in tools/create_publication_data_archive.py before "
+                "building a release: " + ", ".join(missing_metadata),
+                file=sys.stderr,
+            )
+            return 1
+        for key in ("code_release_doi", "article_doi"):
+            if not METADATA[key].strip():
+                print(f"Reminder: fill optional METADATA[{key!r}] when available", file=sys.stderr)
+
+    if output is None:
+        filename = (
+            "publication_data_draft.zip" if allow_missing
+            else f"publication_data_v{METADATA['release_version']}.zip"
+        )
+        output = PROJECT_ROOT / "resources" / "downloads" / filename
     output = output.resolve()
     original = PROJECT_ROOT / "resources" / "downloads" / "publication_data.zip"
     if output == original.resolve() or (
@@ -381,29 +452,26 @@ def build_archive(output: Path, allow_missing: bool) -> int:
         [spec["path"] for spec in existing_specs]
         + ["LICENSE.txt", "README.md", "CHANGELOG.md", "publication_data_manifest.json", "SHA256SUMS"]
     )
+    created_at = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     docs = {
         "README.md": dataset_readme(archive_paths, draft=allow_missing).encode("utf-8"),
         "LICENSE.txt": license_text().encode("utf-8"),
-        "CHANGELOG.md": changelog_text().encode("utf-8"),
+        "CHANGELOG.md": changelog_text(datetime.fromisoformat(created_at).strftime("%Y-%m-%d")).encode("utf-8"),
     }
 
     manifest = {
-        "title": 'Ancilliary data for the reproduction workflow of the article "CryoSwath: a CryoSat-2 swath processor and monthly surface elevation dataset for Arctic mountain glaciers"',
+        **METADATA,
         "article_title": "CryoSwath: a CryoSat-2 swath processor and monthly surface elevation dataset for Arctic mountain glaciers",
-        "publication_status": "draft" if allow_missing else "candidate_pending_publication",
-        "dataset_doi": None,
-        "code_release_doi": None,
-        "release_version": None,
         "license": "CC-BY-4.0",
-        "created_at": datetime.now(timezone.utc)
-        .isoformat(timespec="seconds")
-        .replace("+00:00", "Z"),
+        "created_at": created_at,
         "generated_by": "tools/create_publication_data_archive.py",
         "archive_name": output.name,
         "required_members": sorted(spec["path"] for spec in specs),
         "missing_members": missing,
         "files": manifest_entries,
     }
+    if allow_missing:
+        manifest["publication_status"] = "draft"
     docs["publication_data_manifest.json"] = (
         json.dumps(manifest, indent=2, sort_keys=True) + "\n"
     ).encode("utf-8")
@@ -443,7 +511,8 @@ def build_archive(output: Path, allow_missing: bool) -> int:
     finally:
         temporary.unlink(missing_ok=True)
 
-    print(f"Wrote {'DRAFT (not for release)' if allow_missing else 'candidate (pending publication)'}: {output}")
+    label = "Wrote DRAFT (not for release)" if allow_missing else "Wrote"
+    print(f"{label}: {output}")
     print(f"Packaged {len(existing_specs)} data/figure files and {len(docs)} docs")
     if missing:
         print(f"Skipped {len(missing)} missing members because --allow-missing was set")
@@ -457,8 +526,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output",
         type=Path,
-        default=DEFAULT_OUTPUT,
-        help=f"Archive path to write (default: {DEFAULT_OUTPUT.relative_to(PROJECT_ROOT)})",
+        help="Archive path (default: resources/downloads/publication_data_v<version>.zip; "
+        "publication_data_draft.zip with --allow-missing)",
     )
     parser.add_argument(
         "--allow-missing",
