@@ -1,6 +1,6 @@
 # Changelog
 
-## v2 — awaiting publication
+## v2 — 2026-11-09
 
 ### Fixed
 
@@ -23,7 +23,7 @@
 - Recognize MAAP authentication alongside Science Server FTP credentials.
 - Verify TLS certificates in the cookie helper and preserve existing wget CA/proxy settings.
 
-## v1 - 2026-06-02
+## v1 — 2026-06-02
 
 ### Added
 
