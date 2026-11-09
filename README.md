@@ -3,8 +3,7 @@
 This repository contains the Snakemake workflow that builds the figures,
 tables, and results for the manuscript [*CryoSwath: a CryoSat-2 swath
 processor and monthly surface elevation dataset for Arctic mountain
-glaciers*](https://doi.org/{TODO:replace}). Obtain the immutable code
-release from DOI
+glaciers*](https://doi.org/10.5194/egusphere-2026-5522). The version 2 workflow DOI is
 [10.4121/fdad7bbe-0deb-43d4-9a41-237be0d60df6.v2](https://doi.org/10.4121/fdad7bbe-0deb-43d4-9a41-237be0d60df6.v2).
 Running the full workflow requires (free) registration at NSIDC and ESA
 services and substantial computational resources. Therefore, the
@@ -36,9 +35,9 @@ persist source-selector settings. With all selectors set to `produced`,
 the full workflow took between 1.5 and 5 hours using 48 cores on an AMD
 EPYC 7452 CPU (up to 2.35 GHz) for test runs skipping ArcticDEM mosaic
 and strip downloads. Peak observed per-job memory was about 50 GB;
-earlier up to 90 GB were observed for heavier cal/val runs. Add
-`--resources mem_mb=16000` to enforce a memory limit of about 16 GB for
-example but expect the runtime to increase.
+earlier up to 90 GB were observed for heavier cal/val runs.
+`--resources mem_mb=16000` gives Snakemake a scheduling budget for rules with
+declared memory requests; it does not enforce an operating-system memory limit.
 
 ## Requirements and platforms
 
@@ -81,9 +80,10 @@ pixi run reproduce 1
 The first command shows the planned work without changing outputs. The second
 downloads the public reproduction archive, validates its checksums,
 reruns the lightweight figure paths, and requires neither Earthdata
-nor ESA credentials. Produced source selectors below document which opt-in
-paths need credentials or large local resources. A successful run produces `paper/manuscript.tex`, all twelve retained manuscript
-figures, and the geometry source panels. The following figures are regenerated:
+nor ESA credentials. Produced source selectors below document which
+opt-in paths need credentials or large local resources. A successful run
+produces `paper/manuscript.tex`, all twelve retained manuscript figures,
+and the geometry source panels. The following figures are regenerated:
 
 - `paper/figures/fig02__geometry_sketch.png`
 - `paper/figures/fig03__arctic-wide_time_series.pdf`
@@ -103,43 +103,45 @@ credentials by selecting `downloaded` (as opposed to `produced`) for the
 concerned processing steps. The quickstart above uses the
 default downloaded sources and does not need these credentials.
 
-### NSIDC/RGI Earthdata
+### Private credential file
 
-RGI shapefile downloads use NASA Earthdata credentials. The workflow resolves
-them in this order:
-
-1. `earthdata_username` and `earthdata_password` in `config/snakemake.yaml`
-2. `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`
-3. `$HOME/.netrc`
-4. `./.netrc`
-5. `./.nsidc_cookies`
-
-The config-file fields are present but empty by default:
+Store credentials in `config/credentials.yaml` for convenience:
 
 ```yaml
-earthdata_username: ""
-earthdata_password: ""
+maap_token: "your-personal-MAAP-offline-token"
+earthdata_username: "your-Earthdata-username"
+earthdata_password: "your-Earthdata-password"
 ```
 
-### ESA CryoSat-2 L1b
+Nonempty environment credentials override this file. Earthdata username and
+password must be supplied together in one source; a partial environment pair
+is rejected rather than mixed with the file. The workflow exports local values
+only to the process environment and removes credential placeholders from the
+config serialized into scripts and notebooks.
 
-ESA CryoSat-2 L1b downloads, including
-`fig01__coherence_waveform_examples`, use ESA EOIAM credentials. Environment
-variables are the recommended setup:
+### NSIDC/RGI Earthdata
+
+Set `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, or use the private file above.
+These variables also support CryoSwath's protected DEM downloads. The RGI cookie
+helper additionally supports `$HOME/.netrc`, `./.netrc`, and `.nsidc_cookies`.
+It uses the same private-file loader when invoked directly.
 
 ```bash
-export EOIAM_USER="your-esa-username"
-export EOIAM_PASSWORD="your-esa-password"
+pixi run python scripts/nsidc_cookies.py --no-interactive-helper
 ```
 
-The ESA lookup order is `EOIAM_USER`/`EOIAM_PASSWORD`, keyring,
-`$HOME/.netrc` with `machine science-pds.cryosat.esa.int`, and legacy
-`config.ini` `[user]` `name`/`password`.
+### ESA MAAP and Science Server fallback
 
-If the needed CryoSat-2 L1b files are already present in
-`resources/l1b_cache/`, ESA credentials are not checked. If they are
-missing, absent ESA credentials can make downloads fail or appear to
-hang while the data access layer retries.
+CryoSwath 0.2.10 prefers MAAP for CryoSat L1b delivery. It requires a personal
+MAAP offline token, distinct from the ESA username/password. Generate one at
+<https://portal.maap.eo.esa.int/ini/services/auth/token/90dToken.php>.
+Use `maap_token` in the private file, `ESA_MAAP_OFFLINE_TOKEN` in the environment,
+or store it in keyring with `pixi run cryoswath update-maap-token`.
+
+When no usable MAAP asset is found, CryoSwath can fall back to authenticated
+Science Server FTP. That route uses `EOIAM_USER`/`EOIAM_PASSWORD`, keyring,
+`$HOME/.netrc` with `machine science-pds.cryosat.esa.int`, or legacy
+`config.ini` `[user]` credentials.
 
 ## Configuration
 
@@ -215,12 +217,6 @@ The 2010-2024 trend rasters can be reproduced using the separate 4TU trend
 workflow at
 `https://data.4tu.nl/v3/datasets/f8c6e417-7893-4c26-a532-296f59712089.git`.
 
-### Local trend-raster input
-
-Use `--config trend_dataset_local_dir=/absolute/path/to/rasters` to supply all
-32 trend rasters locally. The directory must differ from the output directory.
-Use the same setting on subsequent runs to retain this input source.
-
 If the 4TU monthly-data server has a broken TLS certificate, use
 `--config download_verify_tls=false` to skip certificate verification.
 
@@ -261,7 +257,7 @@ pixi run snakemake results/one_year_error_correlation.txt --cores 1 --sdm conda 
 
 | Target family | Source selectors that usually matter |
 | --- | --- |
-| `results/one_year_error_correlation.txt`, `paper/figures/figA1__*.pdf`, `paper/figures/figA2__*.pdf` | `calval_source` |
+| `results/one_year_error_correlation.txt`, `paper/figures/figA2__*.pdf`, `paper/figures/figA3__*.pdf` | `calval_source` |
 | `paper/figures/fig03__*.pdf`, `paper/figures/fig04__*.pdf` | `glacierized_area_source`, `elevation_timeseries_source`; `elevation_timeseries_source=produced` also follows `calval_source` |
 | `results/tabA2__subregion_overview.tex` | Published trend rasters are downloaded by default |
 | `paper/figures/fig08__*.pdf`, `results/coverage_analysis.csv` | `coverage_analysis_source`; published trend rasters are downloaded by default |

@@ -358,6 +358,7 @@ if PUBLICATION_ARTIFACT_SOURCE == "downloaded":
 rule calval__estimate_interpolation_uncertainty:
     input:
         CURRENT_SOURCE_CALVAL_INTERPOLATION,
+        CRYOSWATH_AUX_FILES,
     output:
         unc_tbl="<results>/uncertainty_by_interp__uncertainty.csv",
         corr_tbl="<results>/uncertainty_by_interp__correlations.csv",
